@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "top": "end_respawn_anchor:block/end_respawn_anchor_top_off",
+    "bottom": "end_respawn_anchor:block/end_respawn_anchor_bottom",
+    "side": "end_respawn_anchor:block/end_respawn_anchor_side0"
+  }
+}
