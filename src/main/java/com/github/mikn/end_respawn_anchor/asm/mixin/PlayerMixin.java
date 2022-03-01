@@ -23,12 +23,12 @@ public class PlayerMixin {
     private static void inject(ServerLevel level, BlockPos blockPos, float flag1, boolean p_36131_, boolean p_36132_, CallbackInfoReturnable<Optional<Vec3>> cir) {
         BlockState blockstate = level.getBlockState(blockPos);
         Block block = blockstate.getBlock();
-        if (block instanceof EndRespawnAnchorBlock && blockstate.getValue(EndRespawnAnchorBlock.CHARGE) > 0 && EndRespawnAnchorBlock.canSetSpawn(level)) {
-            Optional<Vec3> optional = RespawnAnchorBlock.findStandUpPosition(EntityType.PLAYER, level, blockPos);
+        if (block instanceof EndRespawnAnchorBlock && blockstate.getValue(EndRespawnAnchorBlock.CHARGE) > 0 && EndRespawnAnchorBlock.isEnd(level)) {
+            Optional<Vec3> optional = EndRespawnAnchorBlock.findStandUpPosition(EntityType.PLAYER, level, blockPos);
             if (!p_36132_ && optional.isPresent()) {
-                level.setBlock(blockPos, blockstate.setValue(RespawnAnchorBlock.CHARGE, blockstate.getValue(RespawnAnchorBlock.CHARGE) - 1), 3);
+                level.setBlock(blockPos, blockstate.setValue(EndRespawnAnchorBlock.CHARGE, blockstate.getValue(EndRespawnAnchorBlock.CHARGE) - 1), 3);
+                cir.setReturnValue(optional);
             }
-            cir.setReturnValue(optional);
         }
     }
 }
