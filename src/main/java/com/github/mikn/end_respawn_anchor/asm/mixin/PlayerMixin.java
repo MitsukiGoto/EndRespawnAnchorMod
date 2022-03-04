@@ -25,9 +25,8 @@ public class PlayerMixin {
     private static void inject(ServerLevel level, BlockPos blockPos, float respawnAngle, boolean isRespawnForced, boolean flag, CallbackInfoReturnable<Optional<Vec3>> cir) {
         FindRespawnPositionAndUseSpawnBlockEvent evt = new FindRespawnPositionAndUseSpawnBlockEvent(level, blockPos, flag);
         MinecraftForge.EVENT_BUS.post(evt);
+        EndRespawnAnchor.LOGGER.error(evt.getResult());
         if (evt.getResult() == net.minecraftforge.eventbus.api.Event.Result.ALLOW) {
-            EndRespawnAnchor.LOGGER.debug("Called FindRespawnPositionAndUseSpawnBlockEvent");
-            BlockState blockState = evt.getBlockState();
             cir.setReturnValue(evt.getRespawnPosition());
         }
     }

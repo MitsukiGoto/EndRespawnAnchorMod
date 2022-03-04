@@ -16,7 +16,6 @@ public class FindRespawnPositionAndUseSpawnBlockEvent extends Event {
     private final Level level;
     private final BlockPos blockPos;
     private final boolean flag;
-    private final BlockState blockState;
 
     public Level getLevel() {
         return this.level;
@@ -30,15 +29,10 @@ public class FindRespawnPositionAndUseSpawnBlockEvent extends Event {
         return this.flag;
     }
 
-    public BlockState getBlockState() {
-        return this.blockState;
-    }
-
     public FindRespawnPositionAndUseSpawnBlockEvent(Level level, BlockPos blockPos, boolean flag) {
         this.level = level;
         this.blockPos = blockPos;
         this.flag = flag;
-        this.blockState = level.getBlockState(blockPos);
     }
 
     public Optional<Vec3> getRespawnPosition() {

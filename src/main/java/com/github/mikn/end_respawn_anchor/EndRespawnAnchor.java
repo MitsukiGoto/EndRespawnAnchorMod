@@ -47,6 +47,7 @@ public class EndRespawnAnchor {
             if (!evt.getFlag() && optional.isPresent()) {
                 level.setBlock(blockPos, blockState.setValue(EndRespawnAnchorBlock.CHARGE, blockState.getValue(EndRespawnAnchorBlock.CHARGE) - 1), 3);
                 evt.setResult(Event.Result.ALLOW);
+                return;
             }
         }
         evt.setResult(Event.Result.DENY);
