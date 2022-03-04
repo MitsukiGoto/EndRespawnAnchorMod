@@ -1,29 +1,35 @@
 package com.github.mikn.end_respawn_anchor.block;
 
+import com.github.mikn.end_respawn_anchor.config.EndRespawnAnchorConfig;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.DismountHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.CollisionGetter;
-import net.minecraft.world.level.Level;
+import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 
@@ -53,8 +59,8 @@ public class EndRespawnAnchorBlock extends Block {
         } else if (blockState.getValue(CHARGE) == 0) {
             return InteractionResult.PASS;
         } else if (!isEnd(level)) {
-            if (!level.isClientSide) {
-//                this.explode(blockState, level, blockPos);
+            if (!level.isClientSide && EndRespawnAnchorConfig.isExplode.get()) {
+                this.explode(blockState, level, blockPos);
             }
             return InteractionResult.sidedSuccess(level.isClientSide);
         } else {
@@ -124,4 +130,36 @@ public class EndRespawnAnchorBlock extends Block {
     public static int getScaledChargeLevel(BlockState p_55862_, int p_55863_) {
         return Mth.floor((float) (p_55862_.getValue(CHARGE)) / 4.0F * (float) p_55863_);
     }
+
+    private void explode(BlockState blockState, Level level, final BlockPos blockPos) {
+        level.removeBlock(blockPos, false);
+        boolean flag = Direction.Plane.HORIZONTAL.stream().map(blockPos::relative).anyMatch((p_55854_) -> {
+            return isWaterThatWouldFlow(p_55854_, level);
+        });
+        final boolean flag1 = flag || level.getFluidState(blockPos.above()).is(FluidTags.WATER);
+        ExplosionDamageCalculator explosiondamagecalculator = new ExplosionDamageCalculator() {
+            public Optional<Float> getBlockExplosionResistance(Explosion p_55904_, BlockGetter p_55905_, BlockPos p_55906_, BlockState p_55907_, FluidState p_55908_) {
+                return p_55906_.equals(blockPos) && flag1 ? Optional.of(Blocks.WATER.getExplosionResistance()) : super.getBlockExplosionResistance(p_55904_, p_55905_, p_55906_, p_55907_, p_55908_);
+            }
+        };
+        level.explode((Entity)null, DamageSource.badRespawnPointExplosion(), explosiondamagecalculator, (double)blockPos.getX() + 0.5D, (double)blockPos.getY() + 0.5D, (double)blockPos.getZ() + 0.5D, 5.0F, true, Explosion.BlockInteraction.DESTROY);
+    }
+
+    private static boolean isWaterThatWouldFlow(BlockPos blockPos, Level level) {
+        FluidState fluidstate = level.getFluidState(blockPos);
+        if (!fluidstate.is(FluidTags.WATER)) {
+            return false;
+        } else if (fluidstate.isSource()) {
+            return true;
+        } else {
+            float f = (float)fluidstate.getAmount();
+            if (f < 2.0F) {
+                return false;
+            } else {
+                FluidState fluidstate1 = level.getFluidState(blockPos.below());
+                return !fluidstate1.is(FluidTags.WATER);
+            }
+        }
+    }
+
 }
