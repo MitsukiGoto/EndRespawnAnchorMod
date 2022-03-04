@@ -43,7 +43,7 @@ public class PlayerListMixin {
             isDeadAtTheEnd = true;
         }
         PlayerList playerList = (PlayerList) (Object) this;
-        playerList.getPlayers().remove(p_11237_);
+        playerList.players.remove(p_11237_);
         p_11237_.getLevel().removePlayerImmediately(p_11237_, Entity.RemovalReason.DISCARDED);
         final BlockPos blockpos = p_11237_.getRespawnPosition();
         final float f = p_11237_.getRespawnAngle();
@@ -52,7 +52,7 @@ public class PlayerListMixin {
         boolean flag = p_11237_.isRespawnForced();
         Optional<Vec3> optional;
         if (serverlevel != null && blockpos != null) {
-            if (!isDeadAtTheEnd) {
+            if (!isDeadAtTheEnd && !EndRespawnAnchor.spawnPositions.isEmpty()) {
                 OtherDimensionSpawnPosition position = EndRespawnAnchor.spawnPositions.get(uuid);
                 p_11237_.setRespawnPosition(position.dimension, position.blockPos, position.respawnAngle, false, true);
             }
