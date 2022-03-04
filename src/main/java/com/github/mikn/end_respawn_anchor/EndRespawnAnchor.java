@@ -28,6 +28,7 @@ import java.util.Optional;
 public class EndRespawnAnchor {
     public static final String MODID = "end_respawn_anchor";
     public static final Logger LOGGER = LogManager.getLogger("EndRespawnAnchor/Main");
+
     public EndRespawnAnchor() {
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, EndRespawnAnchorConfig.SPEC, "end_respawn_anchor-common.toml");

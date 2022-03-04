@@ -1,15 +1,10 @@
 package com.github.mikn.end_respawn_anchor.asm.mixin;
 
 import com.github.mikn.end_respawn_anchor.EndRespawnAnchor;
-import com.github.mikn.end_respawn_anchor.block.EndRespawnAnchorBlock;
 import com.github.mikn.end_respawn_anchor.event.FindRespawnPositionAndUseSpawnBlockEvent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.RespawnAnchorBlock;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import org.spongepowered.asm.mixin.Mixin;

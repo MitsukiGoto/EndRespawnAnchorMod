@@ -28,7 +28,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
-import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
@@ -68,7 +67,7 @@ public class EndRespawnAnchorBlock extends Block {
                 ServerPlayer serverplayer = (ServerPlayer) player;
                 if (serverplayer.getRespawnDimension() != level.dimension() || !blockPos.equals(serverplayer.getRespawnPosition())) {
                     serverplayer.setRespawnPosition(level.dimension(), blockPos, 0.0F, false, true);
-                    level.playSound((Player) null, (double) blockPos.getX() + 0.5D, (double) blockPos.getY() + 0.5D, (double) blockPos.getZ() + 0.5D, SoundEvents.RESPAWN_ANCHOR_SET_SPAWN, SoundSource.BLOCKS, 1.0F, 1.0F);
+                    level.playSound(null, (double) blockPos.getX() + 0.5D, (double) blockPos.getY() + 0.5D, (double) blockPos.getZ() + 0.5D, SoundEvents.RESPAWN_ANCHOR_SET_SPAWN, SoundSource.BLOCKS, 1.0F, 1.0F);
                     return InteractionResult.SUCCESS;
                 }
             }
@@ -79,7 +78,7 @@ public class EndRespawnAnchorBlock extends Block {
     public void animateTick(BlockState blockState, Level level, BlockPos blockPos, Random random) {
         if (blockState.getValue(CHARGE) != 0) {
             if (random.nextInt(100) == 0) {
-                level.playSound((Player) null, (double) blockPos.getX() + 0.5D, (double) blockPos.getY() + 0.5D, (double) blockPos.getZ() + 0.5D, SoundEvents.RESPAWN_ANCHOR_AMBIENT, SoundSource.BLOCKS, 1.0F, 1.0F);
+                level.playSound(null, (double) blockPos.getX() + 0.5D, (double) blockPos.getY() + 0.5D, (double) blockPos.getZ() + 0.5D, SoundEvents.RESPAWN_ANCHOR_AMBIENT, SoundSource.BLOCKS, 1.0F, 1.0F);
             }
             double d0 = (double) blockPos.getX() + 0.5D + (0.5D - random.nextDouble());
             double d1 = (double) blockPos.getY() + 1.0D;
@@ -96,7 +95,7 @@ public class EndRespawnAnchorBlock extends Block {
 
     private static Optional<Vec3> findStandUpPosition(EntityType<?> p_55844_, CollisionGetter p_55845_, BlockPos p_55846_, boolean p_55847_) {
         BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
-        for(Vec3i vec3i : RESPAWN_OFFSETS) {
+        for (Vec3i vec3i : RESPAWN_OFFSETS) {
             blockpos$mutableblockpos.set(p_55846_).move(vec3i);
             Vec3 vec3 = DismountHelper.findSafeDismountLocation(p_55844_, p_55845_, blockpos$mutableblockpos, p_55847_);
             if (vec3 != null) {
@@ -116,7 +115,7 @@ public class EndRespawnAnchorBlock extends Block {
 
     public static void charge(Level level, BlockPos blockPos, BlockState blockState) {
         level.setBlock(blockPos, blockState.setValue(CHARGE, blockState.getValue(CHARGE) + 1), 3);
-        level.playSound((Player) null, (double) blockPos.getX() + 0.5D, (double) blockPos.getY() + 0.5D, (double) blockPos.getZ() + 0.5D, SoundEvents.RESPAWN_ANCHOR_CHARGE, SoundSource.BLOCKS, 1.0F, 1.0F);
+        level.playSound(null, (double) blockPos.getX() + 0.5D, (double) blockPos.getY() + 0.5D, (double) blockPos.getZ() + 0.5D, SoundEvents.RESPAWN_ANCHOR_CHARGE, SoundSource.BLOCKS, 1.0F, 1.0F);
     }
 
     private static boolean isRespawnFuel(ItemStack itemStack) {
@@ -142,7 +141,7 @@ public class EndRespawnAnchorBlock extends Block {
                 return p_55906_.equals(blockPos) && flag1 ? Optional.of(Blocks.WATER.getExplosionResistance()) : super.getBlockExplosionResistance(p_55904_, p_55905_, p_55906_, p_55907_, p_55908_);
             }
         };
-        level.explode((Entity)null, DamageSource.badRespawnPointExplosion(), explosiondamagecalculator, (double)blockPos.getX() + 0.5D, (double)blockPos.getY() + 0.5D, (double)blockPos.getZ() + 0.5D, 5.0F, true, Explosion.BlockInteraction.DESTROY);
+        level.explode(null, DamageSource.badRespawnPointExplosion(), explosiondamagecalculator, (double) blockPos.getX() + 0.5D, (double) blockPos.getY() + 0.5D, (double) blockPos.getZ() + 0.5D, 5.0F, true, Explosion.BlockInteraction.DESTROY);
     }
 
     private static boolean isWaterThatWouldFlow(BlockPos blockPos, Level level) {
@@ -152,7 +151,7 @@ public class EndRespawnAnchorBlock extends Block {
         } else if (fluidstate.isSource()) {
             return true;
         } else {
-            float f = (float)fluidstate.getAmount();
+            float f = (float) fluidstate.getAmount();
             if (f < 2.0F) {
                 return false;
             } else {
