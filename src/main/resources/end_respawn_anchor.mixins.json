@@ -4,6 +4,7 @@
   "compatibilityLevel": "JAVA_17",
   "refmap": "end_respawn_anchor.refmap.json",
   "mixins": [
+    "PlayerListMixin",
     "PlayerMixin"
   ],
   "client": [

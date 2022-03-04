@@ -5,8 +5,10 @@ import com.github.mikn.end_respawn_anchor.config.EndRespawnAnchorConfig;
 import com.github.mikn.end_respawn_anchor.event.FindRespawnPositionAndUseSpawnBlockEvent;
 import com.github.mikn.end_respawn_anchor.init.BlockInit;
 import com.github.mikn.end_respawn_anchor.init.ItemInit;
+import com.github.mikn.end_respawn_anchor.util.OtherDimensionSpawnPosition;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -22,12 +24,13 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Optional;
+import java.util.*;
 
 @Mod(EndRespawnAnchor.MODID)
 public class EndRespawnAnchor {
     public static final String MODID = "end_respawn_anchor";
     public static final Logger LOGGER = LogManager.getLogger("EndRespawnAnchor/Main");
+    public static Map<UUID, OtherDimensionSpawnPosition> spawnPositions = new HashMap<>();
 
     public EndRespawnAnchor() {
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
