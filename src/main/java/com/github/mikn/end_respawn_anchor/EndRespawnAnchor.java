@@ -40,11 +40,12 @@ public class EndRespawnAnchor {
     public void FindRespawnEvent(FindRespawnPositionAndUseSpawnBlockEvent evt) {
         Level level = evt.getLevel();
         BlockPos blockPos = evt.getBlockPos();
-        BlockState blockstate = level.getBlockState(blockPos);
-        Block block = blockstate.getBlock();
-        if (block instanceof EndRespawnAnchorBlock && blockstate.getValue(EndRespawnAnchorBlock.CHARGE) > 0 && EndRespawnAnchorBlock.isEnd(level)) {
+        BlockState blockState = level.getBlockState(blockPos);
+        Block block = blockState.getBlock();
+        if (block instanceof EndRespawnAnchorBlock && blockState.getValue(EndRespawnAnchorBlock.CHARGE) > 0 && EndRespawnAnchorBlock.isEnd(level)) {
             Optional<Vec3> optional = EndRespawnAnchorBlock.findStandUpPosition(EntityType.PLAYER, level, blockPos);
             if (!evt.getFlag() && optional.isPresent()) {
+                level.setBlock(blockPos, blockState.setValue(EndRespawnAnchorBlock.CHARGE, blockState.getValue(EndRespawnAnchorBlock.CHARGE) - 1), 3);
                 evt.setResult(Event.Result.ALLOW);
             }
         }
