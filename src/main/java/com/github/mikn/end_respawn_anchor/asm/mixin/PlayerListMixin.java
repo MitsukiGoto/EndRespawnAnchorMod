@@ -54,6 +54,8 @@ public class PlayerListMixin {
         if (serverlevel != null && blockpos != null) {
             if (!isDeadAtTheEnd && !EndRespawnAnchor.spawnPositions.isEmpty()) {
                 OtherDimensionSpawnPosition position = EndRespawnAnchor.spawnPositions.get(uuid);
+                EndRespawnAnchor.LOGGER.error("PLayer has died at other dimension");
+                position.printAll();
                 p_11237_.setRespawnPosition(position.dimension, position.blockPos, position.respawnAngle, false, true);
             }
             optional = Player.findRespawnPositionAndUseSpawnBlock(serverlevel, blockpos, f, flag, p_11238_);

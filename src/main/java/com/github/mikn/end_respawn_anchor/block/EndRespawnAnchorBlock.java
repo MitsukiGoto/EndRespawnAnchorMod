@@ -68,9 +68,14 @@ public class EndRespawnAnchorBlock extends Block {
             if (!level.isClientSide) {
                 ServerPlayer serverplayer = (ServerPlayer) player;
                 if (serverplayer.getRespawnDimension() != level.dimension() || !blockPos.equals(serverplayer.getRespawnPosition())) {
+                    if(!EndRespawnAnchor.spawnPositions.isEmpty()) {
+                        EndRespawnAnchor.spawnPositions.get(serverplayer.getUUID()).printAll();
+                    }
                     if(EndRespawnAnchor.spawnPositions.entrySet().stream().anyMatch(entry -> entry.getKey().equals(serverplayer.getUUID()))) {
+                        EndRespawnAnchor.spawnPositions.get(serverplayer.getUUID()).printAll();
                         EndRespawnAnchor.spawnPositions.remove(serverplayer.getUUID());
                     }
+
                     EndRespawnAnchor.spawnPositions.put(serverplayer.getUUID(), new OtherDimensionSpawnPosition(serverplayer.getRespawnDimension(), serverplayer.getRespawnPosition(), serverplayer.getRespawnAngle()));
                     serverplayer.setRespawnPosition(level.dimension(), blockPos, 0.0F, false, true);
                     level.playSound(null, (double) blockPos.getX() + 0.5D, (double) blockPos.getY() + 0.5D, (double) blockPos.getZ() + 0.5D, SoundEvents.RESPAWN_ANCHOR_SET_SPAWN, SoundSource.BLOCKS, 1.0F, 1.0F);
