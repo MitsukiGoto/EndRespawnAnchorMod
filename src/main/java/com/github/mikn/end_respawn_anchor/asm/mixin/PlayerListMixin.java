@@ -27,6 +27,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import javax.print.attribute.standard.MediaSize;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -41,17 +42,21 @@ public class PlayerListMixin {
         ResourceKey<Level> diedAt = p_11237_.getLevel().dimension();
         EndRespawnAnchor.LOGGER.error(diedAt.toString());
         ServerLevel serverlevel = playerList.server.getLevel(p_11237_.getRespawnDimension());
-        Optional<Vec3> optional;
+        Optional<Vec3> optional = Optional.empty();
         float f = p_11237_.getRespawnAngle();
         boolean flag = p_11237_.isRespawnForced();
-        if(diedAt == Level.END) {
-            serverlevel = playerList.server.getLevel(Level.END);
+        if(!EndRespawnAnchor.spawnPositions.isEmpty()) {
+            OtherDimensionSpawnPosition position = EndRespawnAnchor.spawnPositions.get(p_11237_.getUUID());
+            if(diedAt == Level.END) {
+                serverlevel = playerList.server.getLevel(Level.END);
+                BlockPos pos = p_11237_.getRespawnPosition();
 //            p_11237_.setRespawnPosition(serverlevel.dimension(), new BlockPos(-11,63,-10), f, flag, false);
-            optional = Optional.of(new Vec3(-11, 63, -10));
-        } else {
-            serverlevel = playerList.server.getLevel(Level.OVERWORLD);
+                optional = Optional.of(new Vec3(pos.getX(), pos.getY(), pos.getZ()));
+            } else {
+                serverlevel = playerList.server.getLevel(Level.OVERWORLD);
 //            p_11237_.setRespawnPosition(serverlevel.dimension(), new BlockPos(-207, 63, 246), f, flag, false);
-            optional = Optional.of(new Vec3(-207, 63, 246));
+                optional = Optional.of(new Vec3(position.blockPos.getX(), position.blockPos.getY(), position.blockPos.getZ()));
+            }
         }
         playerList.players.remove(p_11237_);
         p_11237_.getLevel().removePlayerImmediately(p_11237_, Entity.RemovalReason.DISCARDED);
