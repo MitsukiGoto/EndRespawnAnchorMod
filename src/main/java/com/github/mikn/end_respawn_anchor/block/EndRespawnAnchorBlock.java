@@ -67,15 +67,8 @@ public class EndRespawnAnchorBlock extends Block {
         } else {
             if (!level.isClientSide) {
                 ServerPlayer serverplayer = (ServerPlayer) player;
+                EndRespawnAnchor.LOGGER.error("Dim:{} Pos:{}",serverplayer.getRespawnDimension(), serverplayer.getRespawnPosition());
                 if (serverplayer.getRespawnDimension() != level.dimension() || !blockPos.equals(serverplayer.getRespawnPosition())) {
-                    if(!EndRespawnAnchor.spawnPositions.isEmpty()) {
-                        EndRespawnAnchor.spawnPositions.get(serverplayer.getUUID()).printAll();
-                    }
-                    if(EndRespawnAnchor.spawnPositions.entrySet().stream().anyMatch(entry -> entry.getKey().equals(serverplayer.getUUID()))) {
-                        EndRespawnAnchor.spawnPositions.get(serverplayer.getUUID()).printAll();
-                        EndRespawnAnchor.spawnPositions.remove(serverplayer.getUUID());
-                    }
-
                     EndRespawnAnchor.spawnPositions.put(serverplayer.getUUID(), new OtherDimensionSpawnPosition(serverplayer.getRespawnDimension(), serverplayer.getRespawnPosition(), serverplayer.getRespawnAngle()));
                     serverplayer.setRespawnPosition(level.dimension(), blockPos, 0.0F, false, true);
                     level.playSound(null, (double) blockPos.getX() + 0.5D, (double) blockPos.getY() + 0.5D, (double) blockPos.getZ() + 0.5D, SoundEvents.RESPAWN_ANCHOR_SET_SPAWN, SoundSource.BLOCKS, 1.0F, 1.0F);
@@ -143,9 +136,7 @@ public class EndRespawnAnchorBlock extends Block {
 
     private void explode(BlockState blockState, Level level, final BlockPos blockPos) {
         level.removeBlock(blockPos, false);
-        boolean flag = Direction.Plane.HORIZONTAL.stream().map(blockPos::relative).anyMatch((p_55854_) -> {
-            return isWaterThatWouldFlow(p_55854_, level);
-        });
+        boolean flag = Direction.Plane.HORIZONTAL.stream().map(blockPos::relative).anyMatch((p_55854_) -> isWaterThatWouldFlow(p_55854_, level));
         final boolean flag1 = flag || level.getFluidState(blockPos.above()).is(FluidTags.WATER);
         ExplosionDamageCalculator explosiondamagecalculator = new ExplosionDamageCalculator() {
             public Optional<Float> getBlockExplosionResistance(Explosion p_55904_, BlockGetter p_55905_, BlockPos p_55906_, BlockState p_55907_, FluidState p_55908_) {

@@ -33,36 +33,35 @@ import java.util.UUID;
 @Mixin(PlayerList.class)
 public class PlayerListMixin {
     /**
-     * @reason it is hard to make it done without directly modifying the vanilla code
+     * @reason it is hard to make it achieve without directly modifying the vanilla code
      * @author Mikn */
     @Overwrite
     public ServerPlayer respawn(ServerPlayer p_11237_, boolean p_11238_) {
-        boolean isDeadAtTheEnd = false;
-        UUID uuid = p_11237_.getUUID();
-        if(p_11237_.getLevel().dimension()==Level.END) {
-            isDeadAtTheEnd = true;
-        }
         PlayerList playerList = (PlayerList) (Object) this;
+        ResourceKey<Level> diedAt = p_11237_.getLevel().dimension();
+        EndRespawnAnchor.LOGGER.error(diedAt.toString());
+        ServerLevel serverlevel = playerList.server.getLevel(p_11237_.getRespawnDimension());
+        Optional<Vec3> optional;
+        float f = p_11237_.getRespawnAngle();
+        boolean flag = p_11237_.isRespawnForced();
+        if(diedAt == Level.END) {
+            serverlevel = playerList.server.getLevel(Level.END);
+//            p_11237_.setRespawnPosition(serverlevel.dimension(), new BlockPos(-11,63,-10), f, flag, false);
+            optional = Optional.of(new Vec3(-11, 63, -10));
+        } else {
+            serverlevel = playerList.server.getLevel(Level.OVERWORLD);
+//            p_11237_.setRespawnPosition(serverlevel.dimension(), new BlockPos(-207, 63, 246), f, flag, false);
+            optional = Optional.of(new Vec3(-207, 63, 246));
+        }
         playerList.players.remove(p_11237_);
         p_11237_.getLevel().removePlayerImmediately(p_11237_, Entity.RemovalReason.DISCARDED);
-        final BlockPos blockpos = p_11237_.getRespawnPosition();
-        final float f = p_11237_.getRespawnAngle();
-        final ResourceKey<Level> dimension = p_11237_.getRespawnDimension();
-        ServerLevel serverlevel = playerList.server.getLevel(dimension);
-        boolean flag = p_11237_.isRespawnForced();
-        Optional<Vec3> optional;
-        if (serverlevel != null && blockpos != null) {
-            if (!isDeadAtTheEnd && !EndRespawnAnchor.spawnPositions.isEmpty()) {
-                OtherDimensionSpawnPosition position = EndRespawnAnchor.spawnPositions.get(uuid);
-                EndRespawnAnchor.LOGGER.error("PLayer has died at other dimension");
-                position.printAll();
-                p_11237_.setRespawnPosition(position.dimension, position.blockPos, position.respawnAngle, false, true);
-            }
-            optional = Player.findRespawnPositionAndUseSpawnBlock(serverlevel, blockpos, f, flag, p_11238_);
-        } else {
-            optional = Optional.empty();
-        }
-
+        BlockPos blockpos = p_11237_.getRespawnPosition();
+        EndRespawnAnchor.LOGGER.error(blockpos);
+//        if (serverlevel != null) {
+//            optional = Player.findRespawnPositionAndUseSpawnBlock(serverlevel, blockpos, f, flag, p_11238_);
+//        } else {
+//            optional = Optional.empty();
+//        }
         ServerLevel serverlevel1 = serverlevel != null && optional.isPresent() ? serverlevel : playerList.server.overworld();
         ServerPlayer serverplayer = new ServerPlayer(playerList.server, serverlevel1, p_11237_.getGameProfile());
         serverplayer.connection = p_11237_.connection;
@@ -75,7 +74,7 @@ public class PlayerListMixin {
         }
 
         boolean flag2 = false;
-        if (optional.isPresent()) {
+        if (optional.isPresent() && blockpos != null) {
             BlockState blockstate = serverlevel1.getBlockState(blockpos);
             boolean flag1 = blockstate.is(Blocks.RESPAWN_ANCHOR);
             Vec3 vec3 = optional.get();
@@ -84,7 +83,7 @@ public class PlayerListMixin {
                 f1 = f;
             } else {
                 Vec3 vec31 = Vec3.atBottomCenterOf(blockpos).subtract(vec3).normalize();
-                f1 = (float) Mth.wrapDegrees(Mth.atan2(vec31.z, vec31.x) * (double)(180F / (float)Math.PI) - 90.0D);
+                f1 = (float)Mth.wrapDegrees(Mth.atan2(vec31.z, vec31.x) * (double)(180F / (float)Math.PI) - 90.0D);
             }
 
             serverplayer.moveTo(vec3.x, vec3.y, vec3.z, f1, 0.0F);
@@ -115,7 +114,7 @@ public class PlayerListMixin {
         if (flag2) {
             serverplayer.connection.send(new ClientboundSoundPacket(SoundEvents.RESPAWN_ANCHOR_DEPLETE, SoundSource.BLOCKS, (double)blockpos.getX(), (double)blockpos.getY(), (double)blockpos.getZ(), 1.0F, 1.0F));
         }
-        p_11237_.setRespawnPosition(dimension, blockpos, f, false, true);
+
         return serverplayer;
     }
 }
