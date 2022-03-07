@@ -3,6 +3,7 @@ package com.github.mikn.end_respawn_anchor.asm.mixin;
 import com.github.mikn.end_respawn_anchor.EndRespawnAnchor;
 import com.github.mikn.end_respawn_anchor.util.OtherDimensionSpawnPosition;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.protocol.game.*;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
@@ -22,20 +23,15 @@ import net.minecraft.world.level.storage.LevelData;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import javax.print.attribute.standard.MediaSize;
 import java.util.Optional;
-import java.util.UUID;
 
 @Mixin(PlayerList.class)
 public class PlayerListMixin {
     /**
      * @reason it is hard to make it achieve without directly modifying the vanilla code
-     * @author Mikn */
+     * @author Mikn
+     */
     @Overwrite
     public ServerPlayer respawn(ServerPlayer p_11237_, boolean p_11238_) {
         PlayerList playerList = (PlayerList) (Object) this;
@@ -47,29 +43,30 @@ public class PlayerListMixin {
         p_11237_.getLevel().removePlayerImmediately(p_11237_, Entity.RemovalReason.DISCARDED);
         BlockPos blockpos = p_11237_.getRespawnPosition();
         ResourceKey<Level> dimension = p_11237_.getLevel().dimension();
-        if(dimension == Level.END &&  )
-//        if(serverlevel != null && !EndRespawnAnchor.spawnPositions.isEmpty()) {
-//            OtherDimensionSpawnPosition position = EndRespawnAnchor.spawnPositions.get(p_11237_.getUUID());
-//            ResourceKey<Level> dimension = p_11237_.getLevel().dimension();
-//            if (dimension == Level.END && p_11237_.isDeadOrDying() && p_11237_.getRespawnDimension() == Level.END) {
-//                optional = Player.findRespawnPositionAndUseSpawnBlock(serverlevel, blockpos, f, flag, p_11238_);
-//            } else if (dimension == Level.END && p_11237_.isDeadOrDying() && p_11237_.getRespawnDimension() != Level.END) {
-//                optional = Player.findRespawnPositionAndUseSpawnBlock(serverlevel, blockpos, f, flag, p_11238_);
-//            } else if(dimension == Level.END && !p_11237_.isDeadOrDying() && p_11237_.getRespawnDimension() == Level.END) {
-//            } else {
-//                if(p_11237_.getRespawnDimension() != Level.END) {
-//
-//                }
-//                optional = Optional.of(new Vec3(position.blockPos.getX(), position.blockPos.getY(), position.blockPos.getZ()));
-//            }
-//        } else {
-//            optional = Optional.empty();
-//        }
-//        if (serverlevel != null) {
-//            optional = Player.findRespawnPositionAndUseSpawnBlock(serverlevel, blockpos, f, flag, p_11238_);
-//        } else {
-//            optional = Optional.empty();
-//        }
+        if (serverlevel == null) {
+            optional = Optional.empty();
+        } else if (p_11237_.isDeadOrDying() && dimension == Level.END && serverlevel.dimension() == Level.END) {
+            optional = Player.findRespawnPositionAndUseSpawnBlock(serverlevel, blockpos, f, flag, p_11238_);
+        } else if (p_11237_.isDeadOrDying() && dimension == Level.END && serverlevel.dimension() != Level.END) {
+            optional = Player.findRespawnPositionAndUseSpawnBlock(serverlevel, blockpos, f, flag, p_11238_);
+        } else if (p_11237_.isAlive() && dimension == Level.END && serverlevel.dimension() == Level.END && EndRespawnAnchor.spawnPositions.entrySet().stream().anyMatch(entry -> entry.getKey().equals(p_11237_.getUUID()))) {
+            OtherDimensionSpawnPosition position = EndRespawnAnchor.spawnPositions.get(p_11237_.getUUID());
+            p_11237_.setRespawnPosition(position.dimension(),position.blockPos(), f, flag, false);
+            optional = Player.findRespawnPositionAndUseSpawnBlock(serverlevel, blockpos, f, flag, p_11238_);
+        } else if(p_11237_.isAlive() && dimension == Level.END && serverlevel.dimension() != Level.END) {
+            if (serverlevel.dimension() == Level.NETHER) {
+                p_11237_.sendMessage(new TextComponent("You spawn in Nether because you used RespawnAnchor"), p_11237_.getUUID());
+            }
+            optional = Player.findRespawnPositionAndUseSpawnBlock(serverlevel, blockpos, f, flag, p_11238_);
+        } else if(p_11237_.isDeadOrDying() && dimension != Level.END && serverlevel.dimension() == Level.END && EndRespawnAnchor.spawnPositions.entrySet().stream().anyMatch(entry -> entry.getKey().equals(p_11237_.getUUID()))) {
+            OtherDimensionSpawnPosition position = EndRespawnAnchor.spawnPositions.get(p_11237_.getUUID());
+            p_11237_.setRespawnPosition(position.dimension(),position.blockPos(), f, flag, false);
+            optional = Player.findRespawnPositionAndUseSpawnBlock(serverlevel, blockpos, f, flag, p_11238_);
+        } else if(p_11237_.isDeadOrDying() && dimension != Level.END && serverlevel.dimension() != Level.END) {
+            optional = Player.findRespawnPositionAndUseSpawnBlock(serverlevel, blockpos, f, flag, p_11238_);
+        } else {
+            optional = Optional.empty();
+        }
         ServerLevel serverlevel1 = serverlevel != null && optional.isPresent() ? serverlevel : playerList.server.overworld();
         ServerPlayer serverplayer = new ServerPlayer(playerList.server, serverlevel1, p_11237_.getGameProfile());
         serverplayer.connection = p_11237_.connection;
@@ -77,7 +74,7 @@ public class PlayerListMixin {
         serverplayer.setId(p_11237_.getId());
         serverplayer.setMainArm(p_11237_.getMainArm());
 
-        for(String s : p_11237_.getTags()) {
+        for (String s : p_11237_.getTags()) {
             serverplayer.addTag(s);
         }
 
@@ -91,7 +88,7 @@ public class PlayerListMixin {
                 f1 = f;
             } else {
                 Vec3 vec31 = Vec3.atBottomCenterOf(blockpos).subtract(vec3).normalize();
-                f1 = (float)Mth.wrapDegrees(Mth.atan2(vec31.z, vec31.x) * (double)(180F / (float)Math.PI) - 90.0D);
+                f1 = (float) Mth.wrapDegrees(Mth.atan2(vec31.z, vec31.x) * (double) (180F / (float) Math.PI) - 90.0D);
             }
 
             serverplayer.moveTo(vec3.x, vec3.y, vec3.z, f1, 0.0F);
@@ -101,7 +98,7 @@ public class PlayerListMixin {
             serverplayer.connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.NO_RESPAWN_BLOCK_AVAILABLE, 0.0F));
         }
 
-        while(!serverlevel1.noCollision(serverplayer) && serverplayer.getY() < (double)serverlevel1.getMaxBuildHeight()) {
+        while (!serverlevel1.noCollision(serverplayer) && serverplayer.getY() < (double) serverlevel1.getMaxBuildHeight()) {
             serverplayer.setPos(serverplayer.getX(), serverplayer.getY() + 1.0D, serverplayer.getZ());
         }
 
@@ -120,7 +117,7 @@ public class PlayerListMixin {
         serverplayer.setHealth(serverplayer.getHealth());
         net.minecraftforge.event.ForgeEventFactory.firePlayerRespawnEvent(serverplayer, p_11238_);
         if (flag2) {
-            serverplayer.connection.send(new ClientboundSoundPacket(SoundEvents.RESPAWN_ANCHOR_DEPLETE, SoundSource.BLOCKS, (double)blockpos.getX(), (double)blockpos.getY(), (double)blockpos.getZ(), 1.0F, 1.0F));
+            serverplayer.connection.send(new ClientboundSoundPacket(SoundEvents.RESPAWN_ANCHOR_DEPLETE, SoundSource.BLOCKS, blockpos.getX(), blockpos.getY(), blockpos.getZ(), 1.0F, 1.0F));
         }
 
         return serverplayer;

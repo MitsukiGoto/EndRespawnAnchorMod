@@ -5,16 +5,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 
-public class OtherDimensionSpawnPosition {
-    public ResourceKey<Level> dimension;
-    public BlockPos blockPos;
-    public float respawnAngle;
-
-    public OtherDimensionSpawnPosition(ResourceKey<Level> dimension, BlockPos blockPos, float respawnAngle) {
-        this.dimension = dimension;
-        this.blockPos = blockPos;
-        this.respawnAngle = respawnAngle;
-    }
+public record OtherDimensionSpawnPosition(
+        ResourceKey<Level> dimension,
+        BlockPos blockPos, float respawnAngle) {
 
     public void printAll() {
         EndRespawnAnchor.LOGGER.error("dimension: " + dimension);
