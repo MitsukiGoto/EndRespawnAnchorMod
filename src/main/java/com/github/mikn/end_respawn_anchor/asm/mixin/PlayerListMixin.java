@@ -53,42 +53,23 @@ public class PlayerListMixin {
         ResourceKey<Level> dimension = p_11237_.getLevel().dimension();
         ServerLevel serverlevel1;
         if (serverlevel == null || blockpos == null) {
-            EndRespawnAnchor.LOGGER.info("1");
             optional = Optional.empty();
             serverlevel1 = playerList.server.overworld();
-        } else if (isDead && dimension == Level.END && serverlevel.dimension() == Level.END) {
-            EndRespawnAnchor.LOGGER.info("2");
+        } else if ((isDead && dimension == Level.END && serverlevel.dimension() == Level.END) || (isDead && dimension == Level.END && serverlevel.dimension() != Level.END) || (isDead && dimension != Level.END && serverlevel.dimension() != Level.END))  {
             optional = Player.findRespawnPositionAndUseSpawnBlock(serverlevel, blockpos, f, flag, p_11238_);
             serverlevel1 = optional.isPresent() ? serverlevel : playerList.server.overworld();
-        } else if (isDead && dimension == Level.END && serverlevel.dimension() != Level.END) {
-            EndRespawnAnchor.LOGGER.info("3");
-            optional = Player.findRespawnPositionAndUseSpawnBlock(serverlevel, blockpos, f, flag, p_11238_);
-            serverlevel1 = optional.isPresent() ? serverlevel : playerList.server.overworld();
-        } else if (isAlive && dimension == Level.END && serverlevel.dimension() == Level.END && EndRespawnAnchor.spawnPositions.entrySet().stream().anyMatch(entry -> entry.getKey().equals(p_11237_.getUUID()))) {
-            EndRespawnAnchor.LOGGER.info("4");
+        } else if ((isAlive && dimension == Level.END && serverlevel.dimension() == Level.END && EndRespawnAnchor.spawnPositions.entrySet().stream().anyMatch(entry -> entry.getKey().equals(p_11237_.getUUID()))) || (isDead && dimension != Level.END && serverlevel.dimension() == Level.END && EndRespawnAnchor.spawnPositions.entrySet().stream().anyMatch(entry -> entry.getKey().equals(p_11237_.getUUID())))) {
             OtherDimensionSpawnPosition position = EndRespawnAnchor.spawnPositions.get(p_11237_.getUUID());
             optional = EndRespawnAnchorBlock.findStandUpPosition(EntityType.PLAYER, playerList.server.getLevel(position.dimension()), position.blockPos());
             serverlevel1 = playerList.server.getLevel(position.dimension());
             isDifferentWithDefault = true;
         } else if(isAlive && dimension == Level.END && serverlevel.dimension() != Level.END) {
-            EndRespawnAnchor.LOGGER.info("5");
             if (serverlevel.dimension() == Level.NETHER) {
                 p_11237_.sendMessage(new TextComponent("You spawn in Nether because you used RespawnAnchor"), p_11237_.getUUID());
             }
             optional = Player.findRespawnPositionAndUseSpawnBlock(serverlevel, blockpos, f, flag, p_11238_);
             serverlevel1 = optional.isPresent() ? serverlevel : playerList.server.overworld();
-        } else if(isDead && dimension != Level.END && serverlevel.dimension() == Level.END && EndRespawnAnchor.spawnPositions.entrySet().stream().anyMatch(entry -> entry.getKey().equals(p_11237_.getUUID()))) {
-            EndRespawnAnchor.LOGGER.info("6");
-            OtherDimensionSpawnPosition position = EndRespawnAnchor.spawnPositions.get(p_11237_.getUUID());
-            optional = EndRespawnAnchorBlock.findStandUpPosition(EntityType.PLAYER, playerList.server.getLevel(position.dimension()),position.blockPos());
-            serverlevel1 = playerList.server.getLevel(position.dimension());
-            isDifferentWithDefault = true;
-        } else if(isDead && dimension != Level.END && serverlevel.dimension() != Level.END) {
-            EndRespawnAnchor.LOGGER.info("7");
-            optional = Player.findRespawnPositionAndUseSpawnBlock(serverlevel, blockpos, f, flag, p_11238_);
-            serverlevel1 = optional.isPresent() ? serverlevel : playerList.server.overworld();
         } else {
-            EndRespawnAnchor.LOGGER.info("8");
             optional = Optional.empty();
             serverlevel1 = playerList.server.overworld();
         }

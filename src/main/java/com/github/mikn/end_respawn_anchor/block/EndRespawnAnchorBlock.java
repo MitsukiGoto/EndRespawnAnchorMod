@@ -69,7 +69,6 @@ public class EndRespawnAnchorBlock extends Block {
                 ServerPlayer serverplayer = (ServerPlayer) player;
                 if (serverplayer.getRespawnDimension() != level.dimension() || !blockPos.equals(serverplayer.getRespawnPosition())) {
                     if(serverplayer.getRespawnDimension() != Level.END) {
-                        EndRespawnAnchor.LOGGER.error("Dim:{} Pos:{}", serverplayer.getRespawnDimension(), serverplayer.getRespawnPosition());
                         EndRespawnAnchor.spawnPositions.put(serverplayer.getUUID(), new OtherDimensionSpawnPosition(serverplayer.getRespawnDimension(), serverplayer.getRespawnPosition(), serverplayer.getRespawnAngle()));
                     }
                     serverplayer.setRespawnPosition(level.dimension(), blockPos, 0.0F, false, true);
