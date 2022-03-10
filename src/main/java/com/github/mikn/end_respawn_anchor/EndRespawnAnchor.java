@@ -5,8 +5,15 @@ import com.github.mikn.end_respawn_anchor.config.EndRespawnAnchorConfig;
 import com.github.mikn.end_respawn_anchor.event.FindRespawnPositionAndUseSpawnBlockEvent;
 import com.github.mikn.end_respawn_anchor.init.BlockInit;
 import com.github.mikn.end_respawn_anchor.init.ItemInit;
+import com.github.mikn.end_respawn_anchor.util.EndRespawnAnchorData;
 import com.github.mikn.end_respawn_anchor.util.OtherDimensionSpawnPosition;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.NbtComponent;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.profiling.jfr.event.WorldLoadFinishedEvent;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -14,6 +21,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -31,6 +39,7 @@ public class EndRespawnAnchor {
     public static final String MODID = "end_respawn_anchor";
     public static final Logger LOGGER = LogManager.getLogger("EndRespawnAnchor/Main");
     public static Map<UUID, OtherDimensionSpawnPosition> spawnPositions = new HashMap<>();
+    public static String string;
 
     public EndRespawnAnchor() {
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
@@ -38,6 +47,16 @@ public class EndRespawnAnchor {
         BlockInit.BLOCKS.register(bus);
         ItemInit.ITEMS.register(bus);
         MinecraftForge.EVENT_BUS.register(this);
+    }
+
+    @SubscribeEvent
+    public void onWorldLoad(WorldEvent.Load event) {
+        EndRespawnAnchorData.computeIfAbsent(event.getWorld().getServer());
+        CompoundTag tag = new CompoundTag();
+        EndRespawnAnchorData test = EndRespawnAnchorData.load(tag);
+        test.setPositionsString("aaa");
+        string = test.getPositionsString();
+        LOGGER.error(string);
     }
 
     @SubscribeEvent
