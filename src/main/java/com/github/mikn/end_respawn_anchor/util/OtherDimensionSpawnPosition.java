@@ -8,9 +8,4 @@ import java.util.UUID;
 
 public record OtherDimensionSpawnPosition(UUID uuid, ResourceKey<Level> dimension, BlockPos blockPos, float respawnAngle) {
 
-    @Override
-    public String toString() {
-        return uuid.toString()+","+dimension.getRegistryName().getNamespace()+","+blockPos.toString()+","+respawnAngle;
-    }
-
 }

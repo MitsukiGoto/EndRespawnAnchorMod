@@ -19,6 +19,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.LevelResource;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.WorldEvent;
@@ -32,6 +33,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.nio.file.Path;
 import java.util.*;
 
 @Mod(EndRespawnAnchor.MODID)
@@ -39,7 +41,7 @@ public class EndRespawnAnchor {
     public static final String MODID = "end_respawn_anchor";
     public static final Logger LOGGER = LogManager.getLogger("EndRespawnAnchor/Main");
     public static Map<UUID, OtherDimensionSpawnPosition> spawnPositions = new HashMap<>();
-    public static String string;
+    boolean once = true;
 
     public EndRespawnAnchor() {
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
@@ -51,12 +53,10 @@ public class EndRespawnAnchor {
 
     @SubscribeEvent
     public void onWorldLoad(WorldEvent.Load event) {
-        EndRespawnAnchorData.computeIfAbsent(event.getWorld().getServer());
-        CompoundTag tag = new CompoundTag();
-        EndRespawnAnchorData test = EndRespawnAnchorData.load(tag);
-        test.setPositionsString("aaa");
-        string = test.getPositionsString();
-        LOGGER.error(string);
+        if(event.getWorld().getServer() != null && once) {
+            Path path = event.getWorld().getServer().getWorldPath(LevelResource.LEVEL_DATA_FILE).getParent().resolve("data");
+            once = false;
+        }
     }
 
     @SubscribeEvent
