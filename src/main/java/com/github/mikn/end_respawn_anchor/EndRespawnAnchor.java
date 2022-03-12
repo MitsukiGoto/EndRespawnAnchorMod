@@ -65,7 +65,7 @@ public class EndRespawnAnchor {
     }
 
     @SubscribeEvent
-    public void onWorldLoad(WorldEvent.Unload event) {
+    public void onWorldUnload(WorldEvent.Unload event) {
         MinecraftServer server = event.getWorld().getServer();
         if(server != null && onceUnload) {
             EndRespawnAnchorData data = new EndRespawnAnchorData(this.path);

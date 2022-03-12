@@ -35,6 +35,9 @@ import java.util.Optional;
 public class PlayerListMixin {
     /**
      * @reason it is hard to make it achieve without directly modifying the vanilla code
+     * this is targeting respawn method
+     * In the development environment, this works with method name, respawn
+     * but when it runs on the production environment, it works with Notch Name
      * @author Mikn
      */
     @Overwrite

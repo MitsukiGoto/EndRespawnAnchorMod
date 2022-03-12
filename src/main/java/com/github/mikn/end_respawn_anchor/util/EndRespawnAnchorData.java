@@ -29,14 +29,14 @@ public class EndRespawnAnchorData {
     public void save(Map<UUID, OtherDimensionSpawnPosition> map) {
         Datas datas = new Datas();
         map.forEach((key, value) -> datas.add(new DataModel(key.toString(), new Data(new Blockpos(value.blockPos()), provideDimension(value.dimension()), String.valueOf(value.respawnAngle())))));
-        OutputStreamWriter osw = null;
         try {
-            osw = new OutputStreamWriter( new FileOutputStream(this.file));
-        } catch (FileNotFoundException e) {
+            PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file)));
+            var json = gson.toJson(datas);
+            pw.write(json);
+            pw.close();
+        } catch (IOException e) {
             e.printStackTrace();
         }
-        JsonWriter jsw = new JsonWriter(osw);
-        gson.toJson(datas, datas.getClass(), jsw);
     }
 
     public Map<UUID, OtherDimensionSpawnPosition> read() {
