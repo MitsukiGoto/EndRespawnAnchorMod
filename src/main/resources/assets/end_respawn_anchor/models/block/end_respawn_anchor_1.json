@@ -2,7 +2,7 @@
   "parent": "minecraft:block/cube_bottom_top",
   "textures": {
     "top": "end_respawn_anchor:block/end_respawn_anchor_top",
-    "bottom": "end_respawn_anchor:block/end_respawn_anchor_bottom",
+    "bottom": "minecraft:block/end_stone",
     "side": "end_respawn_anchor:block/end_respawn_anchor_side1"
   }
 }
