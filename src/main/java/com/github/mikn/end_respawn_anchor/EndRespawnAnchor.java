@@ -40,8 +40,10 @@ import java.util.*;
 public class EndRespawnAnchor {
     public static final String MODID = "end_respawn_anchor";
     public static final Logger LOGGER = LogManager.getLogger("EndRespawnAnchor/Main");
-    public static Map<UUID, OtherDimensionSpawnPosition> spawnPositions = new HashMap<>();
-    boolean once = true;
+    public static Map<UUID, OtherDimensionSpawnPosition> spawnPositions = null;
+    private Path path;
+    private boolean onceLoad = true;
+    private boolean onceUnload = true;
 
     public EndRespawnAnchor() {
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
@@ -53,9 +55,22 @@ public class EndRespawnAnchor {
 
     @SubscribeEvent
     public void onWorldLoad(WorldEvent.Load event) {
-        if(event.getWorld().getServer() != null && once) {
-            Path path = event.getWorld().getServer().getWorldPath(LevelResource.LEVEL_DATA_FILE).getParent().resolve("data");
-            once = false;
+        MinecraftServer server = event.getWorld().getServer();
+        if(server != null && onceLoad) {
+            this.path = event.getWorld().getServer().getWorldPath(LevelResource.LEVEL_DATA_FILE).getParent().resolve("data/end_respawn_anchor.json");
+            EndRespawnAnchorData data = new EndRespawnAnchorData(this.path);
+            spawnPositions = data.read();
+            onceLoad = false;
+        }
+    }
+
+    @SubscribeEvent
+    public void onWorldLoad(WorldEvent.Unload event) {
+        MinecraftServer server = event.getWorld().getServer();
+        if(server != null && onceUnload) {
+            EndRespawnAnchorData data = new EndRespawnAnchorData(this.path);
+            data.save(spawnPositions);
+            onceUnload = false;
         }
     }
 
