@@ -41,7 +41,7 @@ public class PlayerListMixin {
      * @author Mikn
      */
     @Overwrite
-    public ServerPlayer respawn(ServerPlayer p_11237_, boolean p_11238_) {
+    public ServerPlayer m_11236_(ServerPlayer p_11237_, boolean p_11238_) {
         PlayerList playerList = (PlayerList) (Object) this;
         boolean isDead = p_11237_.isDeadOrDying();
         boolean isAlive = !isDead;
