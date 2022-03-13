@@ -7,6 +7,11 @@ version="0.1"
 displayName="EndRespawnAnchor"
 authors="Mikn"
 description='''
+This mod adds a block like the respawn anchor.
+When you use this block, you will respawn at the end as you die in the end.
+but when you die in the dimension your respawn point was, you will respawn there.
+This mod adds one file [World Save Data]/data/end_respawn_anchor.json
+So, if you remove this mod, you should remove the file.
 '''
 [[dependencies.end_respawn_anchor]]
 modId="forge"
