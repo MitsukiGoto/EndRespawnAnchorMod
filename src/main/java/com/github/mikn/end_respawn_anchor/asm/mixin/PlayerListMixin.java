@@ -44,6 +44,7 @@ public class PlayerListMixin {
         boolean isDead = p_11237_.isDeadOrDying();
         boolean isAlive = !isDead;
         boolean isDifferentWithDefault = false;
+
         RegistryKey<World> dimension = p_11237_.getLevel().dimension();
         ServerWorld serverlevel1;
         playerList.removePlayer(p_11237_);
@@ -53,6 +54,7 @@ public class PlayerListMixin {
         boolean flag = p_11237_.isRespawnForced();
         ServerWorld serverWorld = playerList.server.getLevel(p_11237_.getRespawnDimension());
         Optional<Vector3d> optional;
+
         if (serverWorld == null || blockpos == null) {
             optional = Optional.empty();
             serverlevel1 = playerList.server.overworld();
@@ -74,69 +76,73 @@ public class PlayerListMixin {
             optional = Optional.empty();
             serverlevel1 = playerList.server.overworld();
         }
+
         PlayerInteractionManager playerinteractionmanager;
         if (playerList.server.isDemo()) {
             playerinteractionmanager = new DemoPlayerInteractionManager(serverlevel1);
         } else {
             playerinteractionmanager = new PlayerInteractionManager(serverlevel1);
         }
-        ServerPlayerEntity serverplayer = new ServerPlayerEntity(playerList.server, serverlevel1, p_11237_.getGameProfile(), playerinteractionmanager);
-        serverplayer.connection = p_11237_.connection;
-        serverplayer.restoreFrom(p_11237_, p_11238_);
-        serverplayer.setId(p_11237_.getId());
-        serverplayer.setMainArm(p_11237_.getMainArm());
 
-        for (String s : p_11237_.getTags()) {
-            serverplayer.addTag(s);
+        ServerPlayerEntity serverplayerentity = new ServerPlayerEntity(playerList.server, serverlevel1, p_11237_.getGameProfile(), playerinteractionmanager);
+        serverplayerentity.connection = p_11237_.connection;
+        serverplayerentity.restoreFrom(p_11237_, p_11238_);
+        p_11237_.remove(false); // Forge: clone event had a chance to see old data, now discard it
+        serverplayerentity.setId(p_11237_.getId());
+        serverplayerentity.setMainArm(p_11237_.getMainArm());
+
+        for(String s : p_11237_.getTags()) {
+            serverplayerentity.addTag(s);
         }
 
+        playerList.updatePlayerGameMode(serverplayerentity, p_11237_, serverlevel1);
         boolean flag2 = false;
         if (optional.isPresent()) {
             BlockState blockstate = serverlevel1.getBlockState(blockpos);
             boolean flag1 = blockstate.is(Blocks.RESPAWN_ANCHOR);
-            Vector3d vec3 = optional.get();
+            Vector3d vector3d = optional.get();
             float f1;
             if (!blockstate.is(BlockTags.BEDS) && !flag1) {
                 f1 = f;
             } else {
-                Vector3d vec31 = Vector3d.atBottomCenterOf(blockpos).subtract(vec3).normalize();
-                f1 = (float) MathHelper.wrapDegrees(MathHelper.atan2(vec31.z, vec31.x) * (double) (180F / (float) Math.PI) - 90.0D);
+                Vector3d vector3d1 = Vector3d.atBottomCenterOf(blockpos).subtract(vector3d).normalize();
+                f1 = (float)MathHelper.wrapDegrees(MathHelper.atan2(vector3d1.z, vector3d1.x) * (double)(180F / (float)Math.PI) - 90.0D);
             }
 
-            serverplayer.moveTo(vec3.x, vec3.y, vec3.z, f1, 0.0F);
+            serverplayerentity.moveTo(vector3d.x, vector3d.y, vector3d.z, f1, 0.0F);
             if(isDifferentWithDefault) {
                 OtherDimensionSpawnPosition position = EndRespawnAnchor.spawnPositions.get(p_11237_.getUUID());
-                serverplayer.setRespawnPosition(position.getDimension(), position.getBlockPos(), position.getRespawnAngle(), flag, false);
+                serverplayerentity.setRespawnPosition(position.getDimension(), position.getBlockPos(), position.getRespawnAngle(), flag, false);
             } else {
-                serverplayer.setRespawnPosition(serverlevel1.dimension(), blockpos, f, flag, false);
+                serverplayerentity.setRespawnPosition(serverlevel1.dimension(), blockpos, f, flag, false);
             }
             flag2 = !p_11238_ && flag1;
         } else if (blockpos != null) {
-            serverplayer.connection.send(new SChangeGameStatePacket(SChangeGameStatePacket.NO_RESPAWN_BLOCK_AVAILABLE, 0.0F));
+            serverplayerentity.connection.send(new SChangeGameStatePacket(SChangeGameStatePacket.NO_RESPAWN_BLOCK_AVAILABLE, 0.0F));
         }
 
-        while (!serverlevel1.noCollision(serverplayer) && serverplayer.getY() < (double) serverlevel1.getMaxBuildHeight()) {
-            serverplayer.setPos(serverplayer.getX(), serverplayer.getY() + 1.0D, serverplayer.getZ());
+        while(!serverlevel1.noCollision(serverplayerentity) && serverplayerentity.getY() < 256.0D) {
+            serverplayerentity.setPos(serverplayerentity.getX(), serverplayerentity.getY() + 1.0D, serverplayerentity.getZ());
         }
 
-        IWorldInfo iworldinfo = serverplayer.level.getLevelData();
-        serverplayer.connection.send(new SRespawnPacket(serverplayer.level.dimensionType(), serverplayer.level.dimension(), BiomeManager.obfuscateSeed(serverplayer.getLevel().getSeed()), serverplayer.gameMode.getGameModeForPlayer(), serverplayer.gameMode.getPreviousGameModeForPlayer(), serverplayer.getLevel().isDebug(), serverplayer.getLevel().isFlat(), p_11238_));
-        serverplayer.connection.teleport(serverplayer.getX(), serverplayer.getY(), serverplayer.getZ(), serverplayer.yRot, serverplayer.xRot);
-        serverplayer.connection.send(new SWorldSpawnChangedPacket(serverlevel1.getSharedSpawnPos(), serverlevel1.getSharedSpawnAngle()));
-        serverplayer.connection.send(new SServerDifficultyPacket(iworldinfo.getDifficulty(), iworldinfo.isDifficultyLocked()));
-        serverplayer.connection.send(new SSetExperiencePacket(serverplayer.experienceProgress, serverplayer.totalExperience, serverplayer.experienceLevel));
-        playerList.sendLevelInfo(serverplayer, serverlevel1);
-        playerList.sendPlayerPermissionLevel(serverplayer);
-        serverlevel1.addRespawnedPlayer(serverplayer);
-        playerList.addPlayer(serverplayer);
-        playerList.playersByUUID.put(serverplayer.getUUID(), serverplayer);
-        serverplayer.initMenu();
-        serverplayer.setHealth(serverplayer.getHealth());
-        net.minecraftforge.fml.hooks.BasicEventHooks.firePlayerRespawnEvent(serverplayer, p_11238_);
+        IWorldInfo iworldinfo = serverplayerentity.level.getLevelData();
+        serverplayerentity.connection.send(new SRespawnPacket(serverplayerentity.level.dimensionType(), serverplayerentity.level.dimension(), BiomeManager.obfuscateSeed(serverplayerentity.getLevel().getSeed()), serverplayerentity.gameMode.getGameModeForPlayer(), serverplayerentity.gameMode.getPreviousGameModeForPlayer(), serverplayerentity.getLevel().isDebug(), serverplayerentity.getLevel().isFlat(), p_11238_));
+        serverplayerentity.connection.teleport(serverplayerentity.getX(), serverplayerentity.getY(), serverplayerentity.getZ(), serverplayerentity.yRot, serverplayerentity.xRot);
+        serverplayerentity.connection.send(new SWorldSpawnChangedPacket(serverlevel1.getSharedSpawnPos(), serverlevel1.getSharedSpawnAngle()));
+        serverplayerentity.connection.send(new SServerDifficultyPacket(iworldinfo.getDifficulty(), iworldinfo.isDifficultyLocked()));
+        serverplayerentity.connection.send(new SSetExperiencePacket(serverplayerentity.experienceProgress, serverplayerentity.totalExperience, serverplayerentity.experienceLevel));
+        playerList.sendLevelInfo(serverplayerentity, serverlevel1);
+        playerList.sendPlayerPermissionLevel(serverplayerentity);
+        serverlevel1.addRespawnedPlayer(serverplayerentity);
+        playerList.addPlayer(serverplayerentity);
+        playerList.playersByUUID.put(serverplayerentity.getUUID(), serverplayerentity);
+        serverplayerentity.initMenu();
+        serverplayerentity.setHealth(serverplayerentity.getHealth());
+        net.minecraftforge.fml.hooks.BasicEventHooks.firePlayerRespawnEvent(serverplayerentity, p_11238_);
         if (flag2) {
-            serverplayer.connection.send(new SPlaySoundEffectPacket(SoundEvents.RESPAWN_ANCHOR_DEPLETE, SoundCategory.BLOCKS, (double)blockpos.getX(), (double)blockpos.getY(), (double)blockpos.getZ(), 1.0F, 1.0F));
+            serverplayerentity.connection.send(new SPlaySoundEffectPacket(SoundEvents.RESPAWN_ANCHOR_DEPLETE, SoundCategory.BLOCKS, (double)blockpos.getX(), (double)blockpos.getY(), (double)blockpos.getZ(), 1.0F, 1.0F));
         }
 
-        return serverplayer;
+        return serverplayerentity;
     }
 }
