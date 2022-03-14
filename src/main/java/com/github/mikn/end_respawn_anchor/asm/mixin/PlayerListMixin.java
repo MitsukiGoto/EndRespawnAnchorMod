@@ -60,15 +60,18 @@ public class PlayerListMixin {
             optional = Optional.empty();
             serverlevel1 = playerList.server.overworld();
         } else if ((isDead && dimension == Level.END && serverlevel.dimension() == Level.END) || (isDead && dimension == Level.END && serverlevel.dimension() != Level.END) || (isDead && dimension != Level.END && serverlevel.dimension() != Level.END))  {
+            // At this line, I expect that the player is died in the dimension where his respawn position is set.
             optional = Player.findRespawnPositionAndUseSpawnBlock(serverlevel, blockpos, f, flag, p_11238_);
             serverlevel1 = optional.isPresent() ? serverlevel : playerList.server.overworld();
         } else if ((isAlive && dimension == Level.END && serverlevel.dimension() == Level.END && EndRespawnAnchor.spawnPositions.entrySet().stream().anyMatch(entry -> entry.getKey().equals(p_11237_.getUUID()))) || (isDead && dimension != Level.END && serverlevel.dimension() == Level.END && EndRespawnAnchor.spawnPositions.entrySet().stream().anyMatch(entry -> entry.getKey().equals(p_11237_.getUUID())))) {
+            // At this line, I expect that the player uses end portal and respawn positions is set for him, or he died in the dimension other than end and his respawn position is in the end.
             OtherDimensionSpawnPosition position = EndRespawnAnchor.spawnPositions.get(p_11237_.getUUID());
             spawnPosition = new OtherDimensionSpawnPosition(p_11237_.getRespawnDimension(), p_11237_.getRespawnPosition(), p_11237_.getRespawnAngle());
             optional = EndRespawnAnchorBlock.findStandUpPosition(EntityType.PLAYER, playerList.server.getLevel(position.dimension()), position.blockPos());
             serverlevel1 = playerList.server.getLevel(position.dimension());
             isDifferentWithDefault = true;
         } else if(isAlive && dimension == Level.END && serverlevel.dimension() != Level.END) {
+            // At this line, I expect that the player uses end portal and dimension where is his respawn position is not the end
             if (serverlevel.dimension() == Level.NETHER) {
                 p_11237_.sendMessage(new TextComponent("You spawn in Nether because you used RespawnAnchor"), p_11237_.getUUID());
             }
