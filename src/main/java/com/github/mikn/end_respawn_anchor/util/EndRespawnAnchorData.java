@@ -1,19 +1,17 @@
 package com.github.mikn.end_respawn_anchor.util;
 
-import com.github.mikn.end_respawn_anchor.EndRespawnAnchor;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
-import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.level.Level;
+import net.minecraft.util.RegistryKey;
+import net.minecraft.world.World;
 
 import java.io.*;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+
+import static net.minecraft.world.World.*;
 
 public class EndRespawnAnchorData {
 
@@ -28,11 +26,10 @@ public class EndRespawnAnchorData {
 
     public void save(Map<UUID, OtherDimensionSpawnPosition> map) {
         Datas datas = new Datas();
-        map.forEach((key, value) -> datas.add(new DataModel(key.toString(), new Data(new Blockpos(value.blockPos()), provideDimension(value.dimension()), String.valueOf(value.respawnAngle())))));
+        map.forEach((key, value) -> datas.add(new DataModel(key.toString(), new Data(new Blockpos(value.getBlockPos()), provideDimension(value.getDimension()), String.valueOf(value.getRespawnAngle())))));
         try {
             PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file)));
-            var json = gson.toJson(datas);
-            pw.write(json);
+            pw.write(gson.toJson(datas));
             pw.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -58,23 +55,23 @@ public class EndRespawnAnchorData {
         return map;
     }
 
-    private ResourceKey<Level> getDimension(String dimension) {
+    private RegistryKey<World> getDimension(String dimension) {
         if (dimension.equals("overworld")) {
-            return Level.OVERWORLD;
+            return OVERWORLD;
         } else if (dimension.equals("nether")) {
-            return Level.NETHER;
+            return NETHER;
         } else if (dimension.equals("end")) {
-            return Level.END;
+            return END;
         }
-        return Level.OVERWORLD;
+        return OVERWORLD;
     }
 
-    private String provideDimension(ResourceKey<Level> level) {
-        if (level == Level.OVERWORLD) {
+    private String provideDimension(RegistryKey<World> level) {
+        if (level.equals(OVERWORLD)) {
             return "overworld";
-        } else if (level == Level.NETHER) {
+        } else if (level.equals(NETHER)) {
             return "nether";
-        } else if (level == Level.END) {
+        } else if (level.equals(END)) {
             return "end";
         }
         return "overworld";

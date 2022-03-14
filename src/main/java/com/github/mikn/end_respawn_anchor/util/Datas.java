@@ -1,6 +1,6 @@
 package com.github.mikn.end_respawn_anchor.util;
 
-import net.minecraft.core.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 import java.util.ArrayList;
 

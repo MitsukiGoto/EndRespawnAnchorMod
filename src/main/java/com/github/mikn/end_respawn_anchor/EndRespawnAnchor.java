@@ -7,20 +7,14 @@ import com.github.mikn.end_respawn_anchor.init.BlockInit;
 import com.github.mikn.end_respawn_anchor.init.ItemInit;
 import com.github.mikn.end_respawn_anchor.util.EndRespawnAnchorData;
 import com.github.mikn.end_respawn_anchor.util.OtherDimensionSpawnPosition;
-import net.minecraft.client.Minecraft;
-import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.NbtComponent;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.EntityType;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.profiling.jfr.event.WorldLoadFinishedEvent;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.LevelResource;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.Event;
@@ -35,6 +29,8 @@ import org.apache.logging.log4j.Logger;
 
 import java.nio.file.Path;
 import java.util.*;
+
+import static net.minecraft.world.storage.FolderName.LEVEL_DATA_FILE;
 
 @Mod(EndRespawnAnchor.MODID)
 public class EndRespawnAnchor {
@@ -55,33 +51,36 @@ public class EndRespawnAnchor {
 
     @SubscribeEvent
     public void onWorldLoad(WorldEvent.Load event) {
-        MinecraftServer server = event.getWorld().getServer();
-        if(server != null && onceLoad) {
-            this.path = event.getWorld().getServer().getWorldPath(LevelResource.LEVEL_DATA_FILE).getParent().resolve("data/end_respawn_anchor.json");
-            EndRespawnAnchorData data = new EndRespawnAnchorData(this.path);
-            spawnPositions = data.read();
-            onceLoad = false;
+        if (event.getWorld() instanceof ServerWorld) {
+            ServerWorld serverWorld = (ServerWorld) event.getWorld();
+            MinecraftServer server = serverWorld.getServer();
+            if(onceLoad) {
+                this.path = server.getWorldPath(LEVEL_DATA_FILE).getParent().resolve("data/end_respawn_anchor.json");
+                EndRespawnAnchorData data = new EndRespawnAnchorData(this.path);
+                spawnPositions = data.read();
+                onceLoad = false;
+            }
         }
     }
 
     @SubscribeEvent
     public void onWorldUnload(WorldEvent.Unload event) {
-        MinecraftServer server = event.getWorld().getServer();
-        if(server != null && onceUnload) {
+        if(event.getWorld() instanceof ServerWorld && onceUnload) {
             EndRespawnAnchorData data = new EndRespawnAnchorData(this.path);
             data.save(spawnPositions);
             onceUnload = false;
         }
+
     }
 
     @SubscribeEvent
     public void FindRespawnEvent(FindRespawnPositionAndUseSpawnBlockEvent evt) {
-        Level level = evt.getLevel();
+        World level = evt.getLevel();
         BlockPos blockPos = evt.getBlockPos();
         BlockState blockState = level.getBlockState(blockPos);
         Block block = blockState.getBlock();
         if (block instanceof EndRespawnAnchorBlock && blockState.getValue(EndRespawnAnchorBlock.CHARGE) > 0 && EndRespawnAnchorBlock.isEnd(level)) {
-            Optional<Vec3> optional = EndRespawnAnchorBlock.findStandUpPosition(EntityType.PLAYER, level, blockPos);
+            Optional<Vector3d> optional = EndRespawnAnchorBlock.findStandUpPosition(EntityType.PLAYER, level, blockPos);
             if (!evt.getFlag() && optional.isPresent()) {
                 level.setBlock(blockPos, blockState.setValue(EndRespawnAnchorBlock.CHARGE, blockState.getValue(EndRespawnAnchorBlock.CHARGE) - 1), 3);
                 evt.setResult(Event.Result.ALLOW);
