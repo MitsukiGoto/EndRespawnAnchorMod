@@ -43,6 +43,7 @@ public class PlayerListMixin {
         boolean isDead = p_11237_.isDeadOrDying();
         boolean isAlive = !isDead;
         boolean isDifferentWithDefault = false;
+        OtherDimensionSpawnPosition spawnPosition = null;
         ServerLevel serverlevel = playerList.server.getLevel(p_11237_.getRespawnDimension());
         Optional<Vec3> optional;
         float f = p_11237_.getRespawnAngle();
@@ -56,14 +57,18 @@ public class PlayerListMixin {
             optional = Optional.empty();
             serverlevel1 = playerList.server.overworld();
         } else if ((isDead && dimension == Level.END && serverlevel.dimension() == Level.END) || (isDead && dimension == Level.END && serverlevel.dimension() != Level.END) || (isDead && dimension != Level.END && serverlevel.dimension() != Level.END))  {
+            // At this line, I expect that the player is died in the dimension where his respawn position is set.
             optional = Player.findRespawnPositionAndUseSpawnBlock(serverlevel, blockpos, f, flag, p_11238_);
             serverlevel1 = optional.isPresent() ? serverlevel : playerList.server.overworld();
         } else if ((isAlive && dimension == Level.END && serverlevel.dimension() == Level.END && EndRespawnAnchor.spawnPositions.entrySet().stream().anyMatch(entry -> entry.getKey().equals(p_11237_.getUUID()))) || (isDead && dimension != Level.END && serverlevel.dimension() == Level.END && EndRespawnAnchor.spawnPositions.entrySet().stream().anyMatch(entry -> entry.getKey().equals(p_11237_.getUUID())))) {
+            // At this line, I expect that the player uses end portal and respawn positions is set for him, or he died in the dimension other than end and his respawn position is in the end.
             OtherDimensionSpawnPosition position = EndRespawnAnchor.spawnPositions.get(p_11237_.getUUID());
+            spawnPosition = new OtherDimensionSpawnPosition(p_11237_.getRespawnDimension(), p_11237_.getRespawnPosition(), p_11237_.getRespawnAngle());
             optional = EndRespawnAnchorBlock.findStandUpPosition(EntityType.PLAYER, playerList.server.getLevel(position.dimension()), position.blockPos());
             serverlevel1 = playerList.server.getLevel(position.dimension());
             isDifferentWithDefault = true;
         } else if(isAlive && dimension == Level.END && serverlevel.dimension() != Level.END) {
+            // At this line, I expect that the player uses end portal and dimension where is his respawn position is not the end
             if (serverlevel.dimension() == Level.NETHER) {
                 p_11237_.sendMessage(new TextComponent("You spawn in Nether because you used RespawnAnchor"), p_11237_.getUUID());
             }
@@ -98,8 +103,7 @@ public class PlayerListMixin {
 
             serverplayer.moveTo(vec3.x, vec3.y, vec3.z, f1, 0.0F);
             if(isDifferentWithDefault) {
-                OtherDimensionSpawnPosition position = EndRespawnAnchor.spawnPositions.get(p_11237_.getUUID());
-                serverplayer.setRespawnPosition(position.dimension(), position.blockPos(), position.respawnAngle(), flag, false);
+                serverplayer.setRespawnPosition(spawnPosition.dimension(), spawnPosition.blockPos(), spawnPosition.respawnAngle(), flag, false);
             } else {
                 serverplayer.setRespawnPosition(serverlevel1.dimension(), blockpos, f, flag, false);
             }
@@ -129,7 +133,6 @@ public class PlayerListMixin {
         if (flag2) {
             serverplayer.connection.send(new ClientboundSoundPacket(SoundEvents.RESPAWN_ANCHOR_DEPLETE, SoundSource.BLOCKS, blockpos.getX(), blockpos.getY(), blockpos.getZ(), 1.0F, 1.0F));
         }
-
         return serverplayer;
     }
 }

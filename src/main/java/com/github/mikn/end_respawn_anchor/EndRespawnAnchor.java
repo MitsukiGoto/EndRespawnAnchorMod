@@ -1,6 +1,7 @@
 package com.github.mikn.end_respawn_anchor;
 
 import com.github.mikn.end_respawn_anchor.block.EndRespawnAnchorBlock;
+import com.github.mikn.end_respawn_anchor.command.RespawnPositionCheckCommand;
 import com.github.mikn.end_respawn_anchor.config.EndRespawnAnchorConfig;
 import com.github.mikn.end_respawn_anchor.event.FindRespawnPositionAndUseSpawnBlockEvent;
 import com.github.mikn.end_respawn_anchor.init.BlockInit;
@@ -22,6 +23,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.LevelResource;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -54,7 +57,12 @@ public class EndRespawnAnchor {
     }
 
     @SubscribeEvent
-    public void onWorldLoad(WorldEvent.Load event) {
+    public void RegisterCommandsEvent(final RegisterCommandsEvent evt) {
+        RespawnPositionCheckCommand.register(evt.getDispatcher());
+    }
+
+    @SubscribeEvent
+    public void onWorldLoad(final WorldEvent.Load event) {
         MinecraftServer server = event.getWorld().getServer();
         if(server != null && onceLoad) {
             this.path = event.getWorld().getServer().getWorldPath(LevelResource.LEVEL_DATA_FILE).getParent().resolve("data/end_respawn_anchor.json");
@@ -65,7 +73,7 @@ public class EndRespawnAnchor {
     }
 
     @SubscribeEvent
-    public void onWorldUnload(WorldEvent.Unload event) {
+    public void onWorldUnload(final WorldEvent.Unload event) {
         MinecraftServer server = event.getWorld().getServer();
         if(server != null && onceUnload) {
             EndRespawnAnchorData data = new EndRespawnAnchorData(this.path);
@@ -75,7 +83,7 @@ public class EndRespawnAnchor {
     }
 
     @SubscribeEvent
-    public void FindRespawnEvent(FindRespawnPositionAndUseSpawnBlockEvent evt) {
+    public void FindRespawnEvent(final FindRespawnPositionAndUseSpawnBlockEvent evt) {
         Level level = evt.getLevel();
         BlockPos blockPos = evt.getBlockPos();
         BlockState blockState = level.getBlockState(blockPos);
