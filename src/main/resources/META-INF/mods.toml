@@ -5,7 +5,8 @@ license="MIT License"
 modId="end_respawn_anchor"
 version="1.0"
 displayName="EndRespawnAnchor"
-authors="Mikn"
+authors="Mikndesu"
+credits="Credit for awesome texture goes to rosieholstein"
 description='''
 This mod adds a block like the respawn anchor.
 When you use this block, you will respawn at the end as you die in the end.
