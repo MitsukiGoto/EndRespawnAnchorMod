@@ -51,13 +51,6 @@ import java.util.Optional;
 
 @Mixin(PlayerList.class)
 public class PlayerListMixin {
-    /**
-     * @reason it is hard to make it achieve without directly modifying the vanilla code
-     * this is targeting respawn method
-     * In the development environment, this works with method name, respawn
-     * but when it runs on the production environment, it works with Notch Name
-     * @author Mikn
-     */
     @Overwrite
     public ServerPlayer respawn(ServerPlayer p_11237_, boolean p_11238_) {
         PlayerList playerList = (PlayerList) (Object) this;
