@@ -57,7 +57,9 @@ public class PlayerListMixin {
         boolean isDead = p_11237_.isDeadOrDying();
         boolean isAlive = !isDead;
         boolean isDifferentWithDefault = false;
+        ResourceKey<Level> dimension = p_11237_.getLevel().dimension();
         OtherDimensionSpawnPosition spawnPosition = null;
+
         ServerLevel serverlevel = playerList.server.getLevel(p_11237_.getRespawnDimension());
         Optional<Vec3> optional;
         float f = p_11237_.getRespawnAngle();
@@ -65,8 +67,9 @@ public class PlayerListMixin {
         playerList.players.remove(p_11237_);
         p_11237_.getLevel().removePlayerImmediately(p_11237_, Entity.RemovalReason.DISCARDED);
         BlockPos blockpos = p_11237_.getRespawnPosition();
-        ResourceKey<Level> dimension = p_11237_.getLevel().dimension();
         ServerLevel serverlevel1;
+
+        //
         if (serverlevel == null || blockpos == null) {
             optional = Optional.empty();
             serverlevel1 = playerList.server.overworld();
@@ -92,6 +95,8 @@ public class PlayerListMixin {
             optional = Optional.empty();
             serverlevel1 = playerList.server.overworld();
         }
+        //
+
         ServerPlayer serverplayer = new ServerPlayer(playerList.server, serverlevel1, p_11237_.getGameProfile());
         serverplayer.connection = p_11237_.connection;
         serverplayer.restoreFrom(p_11237_, p_11238_);
@@ -116,11 +121,15 @@ public class PlayerListMixin {
             }
 
             serverplayer.moveTo(vec3.x, vec3.y, vec3.z, f1, 0.0F);
+
+            //
             if(isDifferentWithDefault) {
                 serverplayer.setRespawnPosition(spawnPosition.dimension(), spawnPosition.blockPos(), spawnPosition.respawnAngle(), flag, false);
             } else {
                 serverplayer.setRespawnPosition(serverlevel1.dimension(), blockpos, f, flag, false);
             }
+            //
+
             flag2 = !p_11238_ && flag1;
         } else if (blockpos != null) {
             serverplayer.connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.NO_RESPAWN_BLOCK_AVAILABLE, 0.0F));
