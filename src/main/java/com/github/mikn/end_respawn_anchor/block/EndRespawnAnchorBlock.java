@@ -23,7 +23,7 @@ package com.github.mikn.end_respawn_anchor.block;
 
 import com.github.mikn.end_respawn_anchor.EndRespawnAnchor;
 import com.github.mikn.end_respawn_anchor.config.EndRespawnAnchorConfig;
-import com.github.mikn.end_respawn_anchor.util.OtherDimensionSpawnPosition;
+import com.github.mikn.end_respawn_anchor.util.StoredRespawnPosition;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -89,7 +89,7 @@ public class EndRespawnAnchorBlock extends Block {
                 ServerPlayer serverplayer = (ServerPlayer) player;
                 if (serverplayer.getRespawnDimension() != level.dimension() || !blockPos.equals(serverplayer.getRespawnPosition())) {
                     if(serverplayer.getRespawnDimension() != Level.END) {
-                        EndRespawnAnchor.spawnPositions.put(serverplayer.getUUID(), new OtherDimensionSpawnPosition(serverplayer.getRespawnDimension(), serverplayer.getRespawnPosition(), serverplayer.getRespawnAngle()));
+                        EndRespawnAnchor.spawnPositions.put(serverplayer.getUUID(), new StoredRespawnPosition(serverplayer.getRespawnDimension(), serverplayer.getRespawnPosition(), serverplayer.getRespawnAngle()));
                     }
                     serverplayer.setRespawnPosition(level.dimension(), blockPos, 0.0F, false, true);
                     level.playSound(null, (double) blockPos.getX() + 0.5D, (double) blockPos.getY() + 0.5D, (double) blockPos.getZ() + 0.5D, SoundEvents.RESPAWN_ANCHOR_SET_SPAWN, SoundSource.BLOCKS, 1.0F, 1.0F);

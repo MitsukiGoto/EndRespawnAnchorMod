@@ -43,7 +43,7 @@ public class EndRespawnAnchorData {
         gson = new Gson();
     }
 
-    public void save(Map<UUID, OtherDimensionSpawnPosition> map) {
+    public void save(Map<UUID, StoredRespawnPosition> map) {
         Datas datas = new Datas();
         map.forEach((key, value) -> datas.add(new DataModel(key.toString(), new Data(new Blockpos(value.blockPos()), provideDimension(value.dimension()), String.valueOf(value.respawnAngle())))));
         try {
@@ -56,7 +56,7 @@ public class EndRespawnAnchorData {
         }
     }
 
-    public Map<UUID, OtherDimensionSpawnPosition> read() {
+    public Map<UUID, StoredRespawnPosition> read() {
         InputStreamReader isr = null;
         try {
             isr = new InputStreamReader(new FileInputStream(file));
@@ -66,10 +66,10 @@ public class EndRespawnAnchorData {
         JsonReader jsr = new JsonReader(isr);
         Datas datas = new Datas();
         datas = gson.fromJson(jsr, Datas.class);
-        Map<UUID, OtherDimensionSpawnPosition> map = new HashMap<>();
+        Map<UUID, StoredRespawnPosition> map = new HashMap<>();
         if(datas != null) {
             for (DataModel model : datas.getList()) {
-                map.put(UUID.fromString(model.uuid), new OtherDimensionSpawnPosition(getDimension(model.data.dimension), model.data.blockpos.getBlockPos(), Float.parseFloat(model.data.respawnAngle)));
+                map.put(UUID.fromString(model.uuid), new StoredRespawnPosition(getDimension(model.data.dimension), model.data.blockpos.getBlockPos(), Float.parseFloat(model.data.respawnAngle)));
             }
         }
         return map;
