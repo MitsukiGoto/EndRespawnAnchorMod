@@ -3,7 +3,7 @@ loaderVersion="[36,)"
 license="MIT License"
 [[mods]]
 modId="end_respawn_anchor"
-version="1.0"
+version="1.1"
 displayName="EndRespawnAnchor"
 authors="Mikndesu"
 credits="Credit for awesome texture goes to rosieholstein"
