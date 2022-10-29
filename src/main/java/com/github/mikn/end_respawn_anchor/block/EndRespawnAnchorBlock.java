@@ -144,7 +144,7 @@ public class EndRespawnAnchorBlock extends Block {
     }
 
     private static boolean isRespawnFuel(ItemStack itemStack) {
-        return itemStack.is(Items.ENDER_EYE);
+        return itemStack.is(Items.ENDER_EYE) || itemStack.is(Items.ENDER_PEARL);
     }
 
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
