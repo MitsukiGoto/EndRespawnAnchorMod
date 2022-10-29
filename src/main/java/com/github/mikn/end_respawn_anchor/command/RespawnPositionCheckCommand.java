@@ -22,7 +22,7 @@
 package com.github.mikn.end_respawn_anchor.command;
 
 import com.github.mikn.end_respawn_anchor.EndRespawnAnchor;
-import com.github.mikn.end_respawn_anchor.util.OtherDimensionSpawnPosition;
+import com.github.mikn.end_respawn_anchor.util.StoredRespawnPosition;
 import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.commands.CommandSourceStack;
@@ -42,8 +42,8 @@ public class RespawnPositionCheckCommand {
     private static int PositionCheck(CommandSourceStack source, Collection<GameProfile> targets) {
         for(var gameProfile: targets) {
             if(EndRespawnAnchor.spawnPositions.entrySet().stream().anyMatch(entry -> entry.getKey().equals(gameProfile.getId()))) {
-                OtherDimensionSpawnPosition pos = EndRespawnAnchor.spawnPositions.get(gameProfile.getId());
-                source.sendSuccess(new TextComponent(pos.toString() + " Player: " + gameProfile.getName()), true);
+                StoredRespawnPosition pos = EndRespawnAnchor.spawnPositions.get(gameProfile.getId());
+                source.sendSuccess(new TextComponent("End portal will make " + gameProfile.getName() + " spawn " + pos.toString()), true);
             }
         }
         return 1;
