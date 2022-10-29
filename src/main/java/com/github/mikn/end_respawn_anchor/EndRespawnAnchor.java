@@ -21,26 +21,17 @@
 
 package com.github.mikn.end_respawn_anchor;
 
-import com.github.mikn.end_respawn_anchor.block.EndRespawnAnchorBlock;
 import com.github.mikn.end_respawn_anchor.command.RespawnPositionCheckCommand;
 import com.github.mikn.end_respawn_anchor.config.EndRespawnAnchorConfig;
-import com.github.mikn.end_respawn_anchor.event.FindRespawnPositionAndUseSpawnBlockEvent;
 import com.github.mikn.end_respawn_anchor.init.BlockInit;
 import com.github.mikn.end_respawn_anchor.init.ItemInit;
 import com.github.mikn.end_respawn_anchor.util.EndRespawnAnchorData;
-import com.github.mikn.end_respawn_anchor.util.OtherDimensionSpawnPosition;
-import net.minecraft.core.BlockPos;
+import com.github.mikn.end_respawn_anchor.util.StoredRespawnPosition;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.LevelResource;
-import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.world.WorldEvent;
-import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -57,7 +48,7 @@ import java.util.*;
 public class EndRespawnAnchor {
     public static final String MODID = "end_respawn_anchor";
     public static final Logger LOGGER = LogManager.getLogger("EndRespawnAnchor/Main");
-    public static Map<UUID, OtherDimensionSpawnPosition> spawnPositions = null;
+    public static Map<UUID, StoredRespawnPosition> spawnPositions = null;
     private Path path;
     private boolean onceLoad = true;
     private boolean onceUnload = true;
@@ -94,22 +85,5 @@ public class EndRespawnAnchor {
             data.save(spawnPositions);
             onceUnload = false;
         }
-    }
-
-    @SubscribeEvent
-    public void FindRespawnEvent(final FindRespawnPositionAndUseSpawnBlockEvent evt) {
-        Level level = evt.getLevel();
-        BlockPos blockPos = evt.getBlockPos();
-        BlockState blockState = level.getBlockState(blockPos);
-        Block block = blockState.getBlock();
-        if (block instanceof EndRespawnAnchorBlock && blockState.getValue(EndRespawnAnchorBlock.CHARGE) > 0 && EndRespawnAnchorBlock.isEnd(level)) {
-            Optional<Vec3> optional = EndRespawnAnchorBlock.findStandUpPosition(EntityType.PLAYER, level, blockPos);
-            if (!evt.getFlag() && optional.isPresent()) {
-                level.setBlock(blockPos, blockState.setValue(EndRespawnAnchorBlock.CHARGE, blockState.getValue(EndRespawnAnchorBlock.CHARGE) - 1), 3);
-                evt.setResult(Event.Result.ALLOW);
-                return;
-            }
-        }
-        evt.setResult(Event.Result.DENY);
     }
 }
