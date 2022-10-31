@@ -3,16 +3,15 @@ loaderVersion="[36,)"
 license="MIT License"
 [[mods]]
 modId="end_respawn_anchor"
-version="1.1"
+version="1.0"
 displayName="EndRespawnAnchor"
 authors="Mikndesu"
 credits="Credit for awesome texture goes to rosieholstein"
 description='''
-This mod adds a block like the respawn anchor.
-When you use this block, you will respawn at the end as you die in the end.
-but when you die in the dimension where your respawn point was, you will respawn there.
-This mod adds one file [World Save Data]/data/end_respawn_anchor.json
-So, if you remove this mod, you should remove the file.
+This mod adds one block, "End Respawn Anchor"  
+By this anchor, your respawn position is basically where anchor is unless anchor is charged,  
+but only when you use End Portal to Overworld, you will respawn where your previous respawn  
+position was.
 '''
 [[dependencies.end_respawn_anchor]]
 modId="forge"
@@ -23,6 +22,6 @@ side="BOTH"
 [[dependencies.end_respawn_anchor]]
 modId="minecraft"
 mandatory=true
-versionRange="[1.18.1,1.19)"
+versionRange="[1.19, 1.20)"
 ordering="NONE"
 side="BOTH"
