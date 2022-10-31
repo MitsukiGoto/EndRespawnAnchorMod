@@ -28,7 +28,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.GameProfileArgument;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 
 import java.util.Collection;
 
@@ -43,7 +43,7 @@ public class RespawnPositionCheckCommand {
         for(var gameProfile: targets) {
             if(EndRespawnAnchor.spawnPositions.entrySet().stream().anyMatch(entry -> entry.getKey().equals(gameProfile.getId()))) {
                 StoredRespawnPosition pos = EndRespawnAnchor.spawnPositions.get(gameProfile.getId());
-                source.sendSuccess(new TextComponent("End portal will make " + gameProfile.getName() + " spawn " + pos.toString()), true);
+                source.sendSuccess(Component.literal("End portal will make " + gameProfile.getName() + " spawn " + pos.toString()), true);
             }
         }
         return 1;

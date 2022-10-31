@@ -31,7 +31,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.storage.LevelResource;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -67,10 +67,10 @@ public class EndRespawnAnchor {
     }
 
     @SubscribeEvent
-    public void onWorldLoad(final WorldEvent.Load event) {
-        MinecraftServer server = event.getWorld().getServer();
+    public void onWorldLoad(final LevelEvent.Load event) {
+        MinecraftServer server = event.getLevel().getServer();
         if(server != null && onceLoad) {
-            this.path = event.getWorld().getServer().getWorldPath(LevelResource.LEVEL_DATA_FILE).getParent().resolve("data/end_respawn_anchor.json");
+            this.path = event.getLevel().getServer().getWorldPath(LevelResource.LEVEL_DATA_FILE).getParent().resolve("data/end_respawn_anchor.json");
             EndRespawnAnchorData data = new EndRespawnAnchorData(this.path);
             spawnPositions = data.read();
             onceLoad = false;
@@ -78,8 +78,8 @@ public class EndRespawnAnchor {
     }
 
     @SubscribeEvent
-    public void onWorldUnload(final WorldEvent.Unload event) {
-        MinecraftServer server = event.getWorld().getServer();
+    public void onWorldUnload(final LevelEvent.Unload event) {
+        MinecraftServer server = event.getLevel().getServer();
         if(server != null && onceUnload) {
             EndRespawnAnchorData data = new EndRespawnAnchorData(this.path);
             data.save(spawnPositions);
