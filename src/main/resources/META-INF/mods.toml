@@ -6,12 +6,11 @@ modId="end_respawn_anchor"
 version="1.0"
 displayName="EndRespawnAnchor"
 authors="Mikndesu"
-credits="Credit for awesome texture goes to rosieholstein"
+credits="Credit for awesome textures goes to rosieholstein"
 description='''
-This mod adds one block, "End Respawn Anchor"  
-By this anchor, your respawn position is basically where anchor is unless anchor is charged,  
-but only when you use End Portal to Overworld, you will respawn where your previous respawn  
-position was.
+The EndRespawnAnchor is used to respawn in the End.
+Remember you will always be resurrected in the End,
+no matter where you die.
 '''
 [[dependencies.end_respawn_anchor]]
 modId="forge"
