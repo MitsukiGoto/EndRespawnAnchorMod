@@ -164,7 +164,7 @@ public class EndRespawnAnchorBlock extends Block {
                 return p_55906_.equals(blockPos) && flag1 ? Optional.of(Blocks.WATER.getExplosionResistance()) : super.getBlockExplosionResistance(p_55904_, p_55905_, p_55906_, p_55907_, p_55908_);
             }
         };
-        level.explode(null, DamageSource.badRespawnPointExplosion(), explosiondamagecalculator, (double) blockPos.getX() + 0.5D, (double) blockPos.getY() + 0.5D, (double) blockPos.getZ() + 0.5D, 5.0F, true, Explosion.BlockInteraction.DESTROY);
+        level.explode(null, DamageSource.badRespawnPointExplosion(blockPos.getCenter()), explosiondamagecalculator, (double) blockPos.getX() + 0.5D, (double) blockPos.getY() + 0.5D, (double) blockPos.getZ() + 0.5D, 5.0F, true, Level.ExplosionInteraction.BLOCK);
     }
 
     private static boolean isWaterThatWouldFlow(BlockPos blockPos, Level level) {
