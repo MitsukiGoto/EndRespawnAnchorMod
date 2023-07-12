@@ -3,14 +3,13 @@ loaderVersion="[36,)"
 license="MIT License"
 [[mods]]
 modId="end_respawn_anchor"
-version="1.0"
+version="${file.jarVersion}"
 displayName="EndRespawnAnchor"
 authors="Mikndesu"
 credits="Credit for awesome textures goes to rosieholstein"
 description='''
 The EndRespawnAnchor is used to respawn in the End.
-Remember you will always be resurrected in the End,
-no matter where you die.
+Remember you will always respawn in the End wherever you die.
 '''
 [[dependencies.end_respawn_anchor]]
 modId="forge"

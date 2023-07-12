@@ -23,7 +23,6 @@ package com.github.mikn.end_respawn_anchor.init;
 
 import com.github.mikn.end_respawn_anchor.EndRespawnAnchor;
 import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
