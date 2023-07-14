@@ -26,19 +26,4 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 
 public record StoredRespawnPosition(ResourceKey<Level> dimension, BlockPos blockPos, float respawnAngle) {
-    @Override
-    public String toString() {
-        return " BlockPos: " + blockPos + " in Dimension: " + provideDimension(dimension);
-    }
-
-    private String provideDimension(ResourceKey<Level> level) {
-        if (level == Level.OVERWORLD) {
-            return "the overworld";
-        } else if (level == Level.NETHER) {
-            return "the nether";
-        } else if (level == Level.END) {
-            return "the end";
-        }
-        return "Other dimension";
-    }
 }

@@ -21,7 +21,6 @@
 
 package com.github.mikn.end_respawn_anchor;
 
-import com.github.mikn.end_respawn_anchor.command.RespawnPositionCheckCommand;
 import com.github.mikn.end_respawn_anchor.config.EndRespawnAnchorConfig;
 import com.github.mikn.end_respawn_anchor.init.BlockInit;
 import com.github.mikn.end_respawn_anchor.init.ItemInit;
@@ -32,7 +31,6 @@ import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.level.storage.LevelResource;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
-import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -69,11 +67,6 @@ public class EndRespawnAnchor {
         if(evt.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS) {
             evt.accept(ItemInit.END_RESPAWN_ANCHOR);
         }
-    }
-
-    @SubscribeEvent
-    public void RegisterCommandsEvent(final RegisterCommandsEvent evt) {
-        RespawnPositionCheckCommand.register(evt.getDispatcher());
     }
 
     @SubscribeEvent
