@@ -29,7 +29,7 @@ public class EndRespawnAnchorConfig {
     public static final ForgeConfigSpec.ConfigValue<Boolean> isExplode;
 
     static {
-        BUILDER.push("Config for LavaWalker Enchantment Mod");
+        BUILDER.push("Config for EndRespawnAnchor Mod");
         isExplode = BUILDER.comment("This defines whether it explodes or not in dimensions other than the End.").define("isExplode", false);
         BUILDER.pop();
         SPEC = BUILDER.build();
