@@ -31,7 +31,7 @@ import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.level.storage.LevelResource;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
-import net.minecraftforge.event.level.LevelEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -50,8 +50,6 @@ public class EndRespawnAnchor {
     public static final Logger LOGGER = LogManager.getLogger("EndRespawnAnchor/Main");
     public static Map<UUID, StoredRespawnPosition> spawnPositions = null;
     private Path path;
-    private boolean onceLoad = true;
-    private boolean onceUnload = true;
 
     public EndRespawnAnchor() {
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
@@ -63,30 +61,28 @@ public class EndRespawnAnchor {
     }
 
     @SubscribeEvent
-    public void registerCreativeTabs(final BuildCreativeModeTabContentsEvent  evt) {
+    public void registerCreativeTabs(final BuildCreativeModeTabContentsEvent evt) {
         if(evt.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS) {
             evt.accept(ItemInit.END_RESPAWN_ANCHOR);
         }
     }
 
     @SubscribeEvent
-    public void onWorldLoad(final LevelEvent.Load event) {
-        MinecraftServer server = event.getLevel().getServer();
-        if(server != null && onceLoad) {
-            this.path = event.getLevel().getServer().getWorldPath(LevelResource.LEVEL_DATA_FILE).getParent().resolve("data/end_respawn_anchor.json");
+    public void onPlayerLoggedIn(final PlayerEvent.PlayerLoggedInEvent event) {
+        MinecraftServer server = event.getEntity().getServer();
+        if(server != null) {
+            this.path = server.getWorldPath(LevelResource.LEVEL_DATA_FILE).getParent().resolve("data/end_respawn_anchor.json");
             EndRespawnAnchorData data = new EndRespawnAnchorData(this.path);
             spawnPositions = data.read();
-            onceLoad = false;
         }
     }
 
     @SubscribeEvent
-    public void onWorldUnload(final LevelEvent.Unload event) {
-        MinecraftServer server = event.getLevel().getServer();
-        if(server != null && onceUnload) {
+    public void onPlayerLoggedOut(final PlayerEvent.PlayerLoggedOutEvent event) {
+        MinecraftServer server = event.getEntity().getServer();
+        if(server != null) {
             EndRespawnAnchorData data = new EndRespawnAnchorData(this.path);
             data.save(spawnPositions);
-            onceUnload = false;
         }
     }
 }
