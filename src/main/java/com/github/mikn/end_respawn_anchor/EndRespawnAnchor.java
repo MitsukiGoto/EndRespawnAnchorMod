@@ -31,7 +31,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.level.storage.LevelResource;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.CreativeModeTabEvent;
+import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -65,8 +65,8 @@ public class EndRespawnAnchor {
     }
 
     @SubscribeEvent
-    public void registerCreativeTabs(final CreativeModeTabEvent.BuildContents evt) {
-        if(evt.getTab() == CreativeModeTabs.FUNCTIONAL_BLOCKS) {
+    public void registerCreativeTabs(final BuildCreativeModeTabContentsEvent  evt) {
+        if(evt.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS) {
             evt.accept(ItemInit.END_RESPAWN_ANCHOR);
         }
     }

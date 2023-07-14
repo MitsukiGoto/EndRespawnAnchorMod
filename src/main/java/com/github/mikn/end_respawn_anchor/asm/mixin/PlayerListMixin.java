@@ -56,7 +56,7 @@ public class PlayerListMixin {
     @ModifyVariable(method = "respawn(Lnet/minecraft/server/level/ServerPlayer;Z)Lnet/minecraft/server/level/ServerPlayer;", at = @At("HEAD"), ordinal = 0)
     private ServerPlayer capture_serverplayer(ServerPlayer serverPlayer) {
         _serverPlayer = serverPlayer;
-        dimension = serverPlayer.getLevel().dimension();
+        dimension = serverPlayer.serverLevel().dimension();
         blockpos = serverPlayer.getRespawnPosition();
         serverlevel = playerList.server.getLevel(serverPlayer.getRespawnDimension());
         isAlive = !serverPlayer.isDeadOrDying();
