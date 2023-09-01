@@ -23,7 +23,7 @@ package com.github.mikn.end_respawn_anchor.block;
 
 import com.github.mikn.end_respawn_anchor.EndRespawnAnchor;
 import com.github.mikn.end_respawn_anchor.config.EndRespawnAnchorConfig;
-import com.github.mikn.end_respawn_anchor.util.StoredRespawnPosition;
+import com.github.mikn.end_respawn_anchor.util.RespawnData;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -97,7 +97,7 @@ public class EndRespawnAnchorBlock extends Block {
                         || !blockPos.equals(serverplayer.getRespawnPosition())) {
                     if (serverplayer.getRespawnDimension() != Level.END) {
                         EndRespawnAnchor.spawnPositions.put(serverplayer.getUUID(),
-                                new StoredRespawnPosition(serverplayer.getRespawnDimension(),
+                                new RespawnData(serverplayer.getRespawnDimension(),
                                         serverplayer.getRespawnPosition(), serverplayer.getRespawnAngle()));
                     }
                     serverplayer.setRespawnPosition(level.dimension(), blockPos, 0.0F, false, true);

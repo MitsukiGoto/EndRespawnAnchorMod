@@ -22,7 +22,7 @@
 package com.github.mikn.end_respawn_anchor.asm.mixin;
 
 import com.github.mikn.end_respawn_anchor.EndRespawnAnchor;
-import com.github.mikn.end_respawn_anchor.util.StoredRespawnPosition;
+import com.github.mikn.end_respawn_anchor.util.RespawnData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
@@ -45,7 +45,7 @@ public class PlayerListMixin {
     private ServerPlayer _serverPlayer;
     private boolean _p_11238_;
     private boolean isDifferentWithDefault = false;
-    private StoredRespawnPosition spawnPosition = null;
+    private RespawnData spawnPosition = null;
     private boolean isAlive;
     private ServerLevel serverlevel;
     private BlockPos blockpos;
@@ -78,8 +78,8 @@ public class PlayerListMixin {
                     && EndRespawnAnchor.spawnPositions.entrySet().stream()
                             .anyMatch(entry -> entry.getKey().equals(_serverPlayer.getUUID())))) {
                 // expecting that players use End portal with their respawn position being in the End.
-                StoredRespawnPosition position = EndRespawnAnchor.spawnPositions.get(_serverPlayer.getUUID());
-                spawnPosition = new StoredRespawnPosition(_serverPlayer.getRespawnDimension(),
+                RespawnData position = EndRespawnAnchor.spawnPositions.get(_serverPlayer.getUUID());
+                spawnPosition = new RespawnData(_serverPlayer.getRespawnDimension(),
                         _serverPlayer.getRespawnPosition(), _serverPlayer.getRespawnAngle());
                 _serverPlayer.setRespawnPosition(position.dimension(), position.blockPos(),
                         position.respawnAngle(), flag, false);

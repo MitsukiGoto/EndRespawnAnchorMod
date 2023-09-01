@@ -25,5 +25,5 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 
-public record StoredRespawnPosition(ResourceKey<Level> dimension, BlockPos blockPos, float respawnAngle) {
+public record RespawnData(ResourceKey<Level> dimension, BlockPos blockPos, float respawnAngle) {
 }

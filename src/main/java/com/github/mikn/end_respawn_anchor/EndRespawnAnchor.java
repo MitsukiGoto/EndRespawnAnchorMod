@@ -25,7 +25,7 @@ import com.github.mikn.end_respawn_anchor.config.EndRespawnAnchorConfig;
 import com.github.mikn.end_respawn_anchor.init.BlockInit;
 import com.github.mikn.end_respawn_anchor.init.ItemInit;
 import com.github.mikn.end_respawn_anchor.util.EndRespawnAnchorData;
-import com.github.mikn.end_respawn_anchor.util.StoredRespawnPosition;
+import com.github.mikn.end_respawn_anchor.util.RespawnData;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.level.storage.LevelResource;
@@ -48,7 +48,7 @@ import java.util.*;
 public class EndRespawnAnchor {
     public static final String MODID = "end_respawn_anchor";
     public static final Logger LOGGER = LogManager.getLogger("EndRespawnAnchor/Main");
-    public static Map<UUID, StoredRespawnPosition> spawnPositions = null;
+    public static Map<UUID, RespawnData> spawnPositions = null;
     private Path path;
 
     public EndRespawnAnchor() {
