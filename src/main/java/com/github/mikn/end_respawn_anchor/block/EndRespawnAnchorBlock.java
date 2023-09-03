@@ -22,6 +22,7 @@
 package com.github.mikn.end_respawn_anchor.block;
 
 import com.github.mikn.end_respawn_anchor.EndRespawnAnchor;
+import com.github.mikn.end_respawn_anchor.capabilities.PlayerDataCapability;
 import com.github.mikn.end_respawn_anchor.config.EndRespawnAnchorConfig;
 import com.github.mikn.end_respawn_anchor.util.RespawnData;
 import com.google.common.collect.ImmutableList;
@@ -95,11 +96,11 @@ public class EndRespawnAnchorBlock extends Block {
                 ServerPlayer serverplayer = (ServerPlayer) player;
                 if (serverplayer.getRespawnDimension() != level.dimension()
                         || !blockPos.equals(serverplayer.getRespawnPosition())) {
-                    if (serverplayer.getRespawnDimension() != Level.END) {
-                        EndRespawnAnchor.spawnPositions.put(serverplayer.getUUID(),
-                                new RespawnData(serverplayer.getRespawnDimension(),
-                                        serverplayer.getRespawnPosition(), serverplayer.getRespawnAngle()));
-                    }
+                    serverplayer.getCapability(PlayerDataCapability.INSTANCE, null).ifPresent(cap -> {
+                        RespawnData data = new RespawnData(serverplayer.getRespawnDimension(),
+                                serverplayer.getRespawnPosition(), serverplayer.getRespawnAngle());
+                        cap.setValue(data);
+                    });
                     serverplayer.setRespawnPosition(level.dimension(), blockPos, 0.0F, false, true);
                     level.playSound(null, (double) blockPos.getX() + 0.5D, (double) blockPos.getY() + 0.5D,
                             (double) blockPos.getZ() + 0.5D, SoundEvents.RESPAWN_ANCHOR_SET_SPAWN, SoundSource.BLOCKS,
