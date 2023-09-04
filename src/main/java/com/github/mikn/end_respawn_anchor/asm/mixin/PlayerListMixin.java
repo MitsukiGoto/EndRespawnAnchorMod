@@ -67,6 +67,6 @@ public class PlayerListMixin {
     @Unique
     private boolean shouldReplaceSpawnInfo(ServerPlayer player) {
         // Both Respawn Dimension and position should be changed when players have set their spawn point in the End.
-        return !player.isDeadOrDying() && player.level().dimension() == Level.END && player.getRespawnDimension() != Level.END;
+        return player.isChangingDimension() && player.level().dimension() == Level.END && player.getRespawnDimension() == Level.END;
     }
 }
