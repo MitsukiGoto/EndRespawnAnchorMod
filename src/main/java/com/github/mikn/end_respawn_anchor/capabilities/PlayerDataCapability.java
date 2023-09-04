@@ -1,9 +1,7 @@
 package com.github.mikn.end_respawn_anchor.capabilities;
 
-import java.util.List;
-
 import com.github.mikn.end_respawn_anchor.EndRespawnAnchor;
-import com.github.mikn.end_respawn_anchor.util.RespawnData;
+import com.github.mikn.end_respawn_anchor.RespawnData;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;

@@ -1,6 +1,6 @@
 package com.github.mikn.end_respawn_anchor.capabilities;
 
-import com.github.mikn.end_respawn_anchor.util.RespawnData;
+import com.github.mikn.end_respawn_anchor.RespawnData;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraftforge.common.capabilities.AutoRegisterCapability;

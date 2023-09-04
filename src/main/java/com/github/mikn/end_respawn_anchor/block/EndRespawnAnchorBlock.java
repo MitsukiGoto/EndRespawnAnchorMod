@@ -21,10 +21,9 @@
 
 package com.github.mikn.end_respawn_anchor.block;
 
-import com.github.mikn.end_respawn_anchor.EndRespawnAnchor;
+import com.github.mikn.end_respawn_anchor.RespawnData;
 import com.github.mikn.end_respawn_anchor.capabilities.PlayerDataCapability;
 import com.github.mikn.end_respawn_anchor.config.EndRespawnAnchorConfig;
-import com.github.mikn.end_respawn_anchor.util.RespawnData;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

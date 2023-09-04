@@ -21,7 +21,6 @@
 
 package com.github.mikn.end_respawn_anchor.asm.mixin;
 
-import com.github.mikn.end_respawn_anchor.EndRespawnAnchor;
 import com.github.mikn.end_respawn_anchor.capabilities.PlayerDataCapability;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
