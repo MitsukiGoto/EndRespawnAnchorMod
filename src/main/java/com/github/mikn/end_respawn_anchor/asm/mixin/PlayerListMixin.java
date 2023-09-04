@@ -64,6 +64,15 @@ public class PlayerListMixin {
         return server.getLevel(shouldReplaceSpawnInfo(player) ? level : pDimension);
     }
 
+    @Redirect(method = "respawn(Lnet/minecraft/server/level/ServerPlayer;Z)Lnet/minecraft/server/level/ServerPlayer;", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;setRespawnPosition(Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/core/BlockPos;FZZ)V"))
+    private void redirect_setRespawnPosition(ServerPlayer newPlayer, ResourceKey<Level> dimension, BlockPos blockPos, float f, boolean flag, boolean sendMessage, ServerPlayer oldPlayer, boolean pKeepEverything) {
+        if(shouldReplaceSpawnInfo(oldPlayer)) {
+            newPlayer.setRespawnPosition(oldPlayer.getRespawnDimension(), oldPlayer.getRespawnPosition(), oldPlayer.getRespawnAngle(), oldPlayer.isRespawnForced(), false);
+        } else {
+            newPlayer.setRespawnPosition(dimension, blockPos, f, flag, false);
+        }
+    }
+
     @Unique
     private boolean shouldReplaceSpawnInfo(ServerPlayer player) {
         // Both Respawn Dimension and position should be changed when players have set their spawn point in the End.
