@@ -96,11 +96,13 @@ public class EndRespawnAnchorBlock extends Block {
                 ServerPlayer serverplayer = (ServerPlayer) player;
                 if (serverplayer.getRespawnDimension() != level.dimension()
                         || !blockPos.equals(serverplayer.getRespawnPosition())) {
-                    serverplayer.getCapability(PlayerDataCapability.INSTANCE, null).ifPresent(cap -> {
-                        RespawnData data = new RespawnData(serverplayer.getRespawnDimension(),
-                                serverplayer.getRespawnPosition(), serverplayer.getRespawnAngle());
-                        cap.setValue(data);
-                    });
+                    if(serverplayer.getRespawnDimension() != Level.END) {
+                        serverplayer.getCapability(PlayerDataCapability.INSTANCE, null).ifPresent(cap -> {
+                            RespawnData data = new RespawnData(serverplayer.getRespawnDimension(),
+                                    serverplayer.getRespawnPosition(), serverplayer.getRespawnAngle());
+                            cap.setValue(data);
+                        });
+                    }
                     serverplayer.setRespawnPosition(level.dimension(), blockPos, 0.0F, false, true);
                     level.playSound(null, (double) blockPos.getX() + 0.5D, (double) blockPos.getY() + 0.5D,
                             (double) blockPos.getZ() + 0.5D, SoundEvents.RESPAWN_ANCHOR_SET_SPAWN, SoundSource.BLOCKS,
