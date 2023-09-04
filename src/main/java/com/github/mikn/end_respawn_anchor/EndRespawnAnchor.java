@@ -84,14 +84,9 @@ public class EndRespawnAnchor {
 
     @SubscribeEvent
     public void onPlayerClone(final PlayerEvent.Clone event) {
-//        if (!event.getEntity().level().isClientSide() && event.getEntity() instanceof ServerPlayer player) {
-//            ServerPlayer originalPlayer = (ServerPlayer) event.getOriginal();
-//            player.getCapability(PlayerDataCapability.INSTANCE, null).ifPresent(
-//                    cap -> originalPlayer.getCapability(PlayerDataCapability.INSTANCE, null).ifPresent(cap1 -> {
-//                        originalPlayer.reviveCaps();
-//                        var v = cap1.getRespawnData();
-//                        cap.deserializeNBT(cap1.serializeNBT());
-//                    }));
-//        }
+        event.getOriginal().reviveCaps();
+        event.getOriginal().getCapability(PlayerDataCapability.INSTANCE).ifPresent(cap ->
+                event.getEntity().getCapability(PlayerDataCapability.INSTANCE).ifPresent(c -> c.deserializeNBT(cap.serializeNBT())));
+        event.getOriginal().invalidateCaps();
     }
 }
