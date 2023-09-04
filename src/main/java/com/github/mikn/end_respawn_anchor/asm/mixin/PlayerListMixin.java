@@ -22,6 +22,7 @@
 package com.github.mikn.end_respawn_anchor.asm.mixin;
 
 import com.github.mikn.end_respawn_anchor.capabilities.PlayerDataCapability;
+import com.github.mikn.end_respawn_anchor.init.BlockInit;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
@@ -29,6 +30,9 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Debug;
 import org.spongepowered.asm.mixin.Mixin;
 
@@ -70,6 +74,11 @@ public class PlayerListMixin {
         } else {
             newPlayer.setRespawnPosition(dimension, blockPos, f, flag, false);
         }
+    }
+
+    @Redirect(method = "respawn(Lnet/minecraft/server/level/ServerPlayer;Z)Lnet/minecraft/server/level/ServerPlayer;", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;is(Lnet/minecraft/world/level/block/Block;)Z"))
+    private boolean redirect_is(BlockState blockState, Block block) {
+        return blockState.is(Blocks.RESPAWN_ANCHOR) || blockState.is(BlockInit.END_RESPAWN_ANCHOR.get());
     }
 
     @Unique
