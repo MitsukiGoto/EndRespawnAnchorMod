@@ -44,18 +44,21 @@ public class PlayerListMixin {
 
     @Redirect(method= "respawn(Lnet/minecraft/server/level/ServerPlayer;Z)Lnet/minecraft/server/level/ServerPlayer;", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;getRespawnPosition()Lnet/minecraft/core/BlockPos;"))
     private BlockPos redirect_position(ServerPlayer player) {
+        player.reviveCaps();
         var cap = player.getCapability(PlayerDataCapability.INSTANCE, null);
         return shouldReplaceSpawnInfo(player) && cap.isPresent() ? cap.resolve().get().getRespawnData().blockPos(): player.getRespawnPosition();
     }
     
     @Redirect(method= "respawn(Lnet/minecraft/server/level/ServerPlayer;Z)Lnet/minecraft/server/level/ServerPlayer;", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;getRespawnAngle()F"))
     private float redirect_f(ServerPlayer player) {
+        player.reviveCaps();
         var cap = player.getCapability(PlayerDataCapability.INSTANCE, null);
         return shouldReplaceSpawnInfo(player) && cap.isPresent() ? cap.resolve().get().getRespawnData().respawnAngle(): player.getRespawnAngle();
     }
 
     @Redirect(method = "respawn(Lnet/minecraft/server/level/ServerPlayer;Z)Lnet/minecraft/server/level/ServerPlayer;", at = @At(value = "INVOKE", target ="Lnet/minecraft/server/MinecraftServer;getLevel(Lnet/minecraft/resources/ResourceKey;)Lnet/minecraft/server/level/ServerLevel;"))
     private ServerLevel redirect_serverlevel(MinecraftServer server, ResourceKey<Level> pDimension, ServerPlayer player, boolean pKeepEverything) {
+        player.reviveCaps();
         var cap = player.getCapability(PlayerDataCapability.INSTANCE, null);
         ResourceKey<Level> level = cap.isPresent()? cap.resolve().get().getRespawnData().dimension() : Level.OVERWORLD;
         return server.getLevel(shouldReplaceSpawnInfo(player) ? level : pDimension);
