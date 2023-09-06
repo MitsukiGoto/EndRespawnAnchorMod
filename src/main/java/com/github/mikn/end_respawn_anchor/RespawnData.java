@@ -19,11 +19,11 @@
  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.github.mikn.end_respawn_anchor.util;
+package com.github.mikn.end_respawn_anchor;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 
-public record StoredRespawnPosition(ResourceKey<Level> dimension, BlockPos blockPos, float respawnAngle) {
+public record RespawnData(ResourceKey<Level> dimension, BlockPos blockPos, float respawnAngle) {
 }

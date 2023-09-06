@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2022 Mikndesu
+ Copyright (c) 2023 Mikndesu
 
  Permission is hereby granted, free of charge, to any person obtaining a copy of
  this software and associated documentation files (the "Software"), to deal in
@@ -19,21 +19,16 @@
  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.github.mikn.end_respawn_anchor.config;
+package com.github.mikn.end_respawn_anchor.capabilities;
 
-import net.minecraftforge.common.ForgeConfigSpec;
+import com.github.mikn.end_respawn_anchor.RespawnData;
 
-public class EndRespawnAnchorConfig {
-    public static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
-    public static final ForgeConfigSpec SPEC;
-    public static final ForgeConfigSpec.ConfigValue<Boolean> isExplode;
-    public static final ForgeConfigSpec.ConfigValue<Boolean> shouldChangeSpawnInfo;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraftforge.common.capabilities.AutoRegisterCapability;
+import net.minecraftforge.common.util.INBTSerializable;
 
-    static {
-        BUILDER.push("Config for EndRespawnAnchor Mod");
-        isExplode = BUILDER.comment("This defines whether it explodes or not in dimensions other than the End.").define("isExplode", false);
-        shouldChangeSpawnInfo = BUILDER.comment("This defines whether respawn position should be changed in particular situation. \n See description for more details.").define("shouldChangeSpawnInfo", true);
-        BUILDER.pop();
-        SPEC = BUILDER.build();
-    }
+@AutoRegisterCapability
+public interface IPlayerDataCapability extends INBTSerializable<CompoundTag> {
+    RespawnData getRespawnData();
+    void setValue(RespawnData respawnData);
 }
