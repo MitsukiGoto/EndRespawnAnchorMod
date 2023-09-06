@@ -22,6 +22,7 @@
 package com.github.mikn.end_respawn_anchor.asm.mixin;
 
 import com.github.mikn.end_respawn_anchor.capabilities.PlayerDataCapability;
+import com.github.mikn.end_respawn_anchor.config.EndRespawnAnchorConfig;
 import com.github.mikn.end_respawn_anchor.init.BlockInit;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
@@ -84,6 +85,6 @@ public class PlayerListMixin {
     @Unique
     private boolean shouldReplaceSpawnInfo(ServerPlayer player) {
         // Both Respawn Dimension and position should be changed when players have set their spawn point in the End.
-        return player.isChangingDimension() && player.level().dimension() == Level.END && player.getRespawnDimension() == Level.END;
+        return EndRespawnAnchorConfig.shouldChangeSpawnInfo.get() && player.isChangingDimension() && player.level().dimension() == Level.END && player.getRespawnDimension() == Level.END;
     }
 }
