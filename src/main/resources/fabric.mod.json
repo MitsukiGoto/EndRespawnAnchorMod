@@ -1,0 +1,41 @@
+{
+    "schemaVersion": 1,
+    "id": "end_respawn_anchor",
+    "version": "${version}",
+  
+    "name": "EndRespawnAnchor",
+    "description": "",
+    "authors": [
+      "Mikndesu"
+    ],
+    "icon": "assets/end_respawn_anchor/icon.png",
+    "contact": {
+      "homepage": "https://github.com/Mikndesu/",
+      "issues": "https://github.com/Mikndesu/EndRespawnAnchorMod/issues",
+      "sources": "https://github.com/Mikndesu/EndRespawnAnchorMod"
+    },
+    "license": "MIT License",
+    "environment": "*",
+    "entrypoints": {
+      "main": [
+        "com.github.mikn.end_respawn_anchor.EndRespawnAnchor"
+      ],
+      "modmenu": [
+        "com.github.mikn.end_respawn_anchor.client.screen.EndRespawnAnchorModMenuIntegration"
+      ]
+    },
+    "mixins": [
+      "end_respawn_anchor.mixins.json"
+    ],
+  
+    "depends": {
+      "fabricloader": ">=0.14.0",
+      "fabric": "*",
+      "minecraft": "1.20.x",
+      "java": ">=17",
+      "cloth-config": "*"
+    },
+    "suggests": {
+      "modmenu": "*"
+    }
+  }
