@@ -21,62 +21,37 @@
 
 package com.github.mikn.end_respawn_anchor;
 
-import com.github.mikn.end_respawn_anchor.capabilities.PlayerDataCapability;
-import com.github.mikn.end_respawn_anchor.capabilities.PlayerDataCapabilityAttacher;
 import com.github.mikn.end_respawn_anchor.config.EndRespawnAnchorConfig;
 import com.github.mikn.end_respawn_anchor.init.BlockInit;
 import com.github.mikn.end_respawn_anchor.init.ItemInit;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
+
+import me.shedaniel.autoconfig.AutoConfig;
+import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
+import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTabs;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.AttachCapabilitiesEvent;
-import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-@Mod(EndRespawnAnchor.MODID)
-public class EndRespawnAnchor {
+public class EndRespawnAnchor implements ModInitializer {
     public static final String MODID = "end_respawn_anchor";
     public static final Logger LOGGER = LogManager.getLogger("EndRespawnAnchor/Main");
+    public static final EndRespawnAnchorConfig HOLDER;
 
-    public EndRespawnAnchor() {
-        IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
-        bus.addListener(this::registerCreativeTabs);
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, EndRespawnAnchorConfig.SPEC,
-                "end_respawn_anchor-common.toml");
-        BlockInit.BLOCKS.register(bus);
-        ItemInit.ITEMS.register(bus);
-        MinecraftForge.EVENT_BUS.register(this);
+    @Override
+    public void onInitialize() {
+        Registry.register(BuiltInRegistries.BLOCK, new ResourceLocation(EndRespawnAnchor.MODID, "end_respawn_anchor"), BlockInit.END_RESPAWN_ANCHOR);
+        Registry.register(BuiltInRegistries.ITEM, new ResourceLocation(EndRespawnAnchor.MODID, "end_respawn_anchor"), ItemInit.END_RESPAWN_ANCHOR);
+        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS).register(content -> {
+            content.accept(ItemInit.END_RESPAWN_ANCHOR);
+        });
+    }
+    static {
+        HOLDER = AutoConfig.register(EndRespawnAnchorConfig.class, JanksonConfigSerializer::new).getConfig();
     }
 
-    @SubscribeEvent
-    public void registerCreativeTabs(final BuildCreativeModeTabContentsEvent evt) {
-        if (evt.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS) {
-            evt.accept(ItemInit.END_RESPAWN_ANCHOR);
-        }
-    }
-
-    @SubscribeEvent
-    public void attachCapabilitiesEntity(AttachCapabilitiesEvent<Entity> event) {
-        if (event.getObject() instanceof Player) {
-            PlayerDataCapabilityAttacher.attach(event);
-        }
-    }
-
-    @SubscribeEvent
-    public void onPlayerClone(final PlayerEvent.Clone event) {
-        event.getOriginal().reviveCaps();
-        event.getOriginal().getCapability(PlayerDataCapability.INSTANCE).ifPresent(cap ->
-                event.getEntity().getCapability(PlayerDataCapability.INSTANCE).ifPresent(c -> c.deserializeNBT(cap.serializeNBT())));
-        event.getOriginal().invalidateCaps();
-    }
 }

@@ -21,9 +21,7 @@
 
 package com.github.mikn.end_respawn_anchor.block;
 
-import com.github.mikn.end_respawn_anchor.RespawnData;
-import com.github.mikn.end_respawn_anchor.capabilities.PlayerDataCapability;
-import com.github.mikn.end_respawn_anchor.config.EndRespawnAnchorConfig;
+import com.github.mikn.end_respawn_anchor.EndRespawnAnchor;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -86,7 +84,7 @@ public class EndRespawnAnchorBlock extends Block {
         } else if (blockState.getValue(CHARGE) == 0) {
             return InteractionResult.PASS;
         } else if (!isEnd(level)) {
-            if (!level.isClientSide && EndRespawnAnchorConfig.isExplode.get()) {
+            if (!level.isClientSide && EndRespawnAnchor.HOLDER.isExplode) {
                 this.explode(blockState, level, blockPos);
             }
             return InteractionResult.sidedSuccess(level.isClientSide);
@@ -96,11 +94,11 @@ public class EndRespawnAnchorBlock extends Block {
                 if (serverplayer.getRespawnDimension() != level.dimension()
                         || !blockPos.equals(serverplayer.getRespawnPosition())) {
                     if(serverplayer.getRespawnDimension() != Level.END) {
-                        serverplayer.getCapability(PlayerDataCapability.INSTANCE, null).ifPresent(cap -> {
-                            RespawnData data = new RespawnData(serverplayer.getRespawnDimension(),
-                                    serverplayer.getRespawnPosition(), serverplayer.getRespawnAngle());
-                            cap.setValue(data);
-                        });
+                        // serverplayer.getCapability(PlayerDataCapability.INSTANCE, null).ifPresent(cap -> {
+                        //     RespawnData data = new RespawnData(serverplayer.getRespawnDimension(),
+                        //             serverplayer.getRespawnPosition(), serverplayer.getRespawnAngle());
+                        //     cap.setValue(data);
+                        // });
                     }
                     serverplayer.setRespawnPosition(level.dimension(), blockPos, 0.0F, false, true);
                     level.playSound(null, (double) blockPos.getX() + 0.5D, (double) blockPos.getY() + 0.5D,
