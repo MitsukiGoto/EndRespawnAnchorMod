@@ -20,6 +20,7 @@
         "com.github.mikn.end_respawn_anchor.EndRespawnAnchor"
       ],
       "modmenu": [
+        "com.github.mikn.end_respawn_anchor.client.screen.EndRespawnAnchorModMenuIntegration"
       ]
     },
     "mixins": [
