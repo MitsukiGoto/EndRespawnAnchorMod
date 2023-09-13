@@ -1,0 +1,4 @@
+accessWidener v2 named
+
+accessible field net/minecraft/server/players/PlayerList playerIo Lnet/minecraft/world/level/storage/PlayerDataStorage;
+accessible field net/minecraft/world/level/storage/PlayerDataStorage playerDir Ljava/io/File;

@@ -73,6 +73,7 @@ tasks.jar {
 
 loom {
 	mixin.defaultRefmapName.set("end_respawn_anchor.refmap.json")
+	accessWidenerPath.set(File("src/main/resources/end_respawn_anchor.accesswidener"))
 }
 
 curseforge {

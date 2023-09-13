@@ -5,7 +5,8 @@
   "refmap": "end_respawn_anchor.refmap.json",
   "mixins": [
     "PlayerListMixin",
-    "PlayerMixin"
+    "PlayerMixin",
+    "ServerPlayerMixin"
   ],
   "client": [
   ],

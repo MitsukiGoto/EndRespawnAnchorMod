@@ -22,7 +22,9 @@
 package com.github.mikn.end_respawn_anchor.block;
 
 import com.github.mikn.end_respawn_anchor.EndRespawnAnchor;
+import com.github.mikn.end_respawn_anchor.IServerPlayerMixin;
 import com.google.common.collect.ImmutableList;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
@@ -93,12 +95,11 @@ public class EndRespawnAnchorBlock extends Block {
                 ServerPlayer serverplayer = (ServerPlayer) player;
                 if (serverplayer.getRespawnDimension() != level.dimension()
                         || !blockPos.equals(serverplayer.getRespawnPosition())) {
-                    if(serverplayer.getRespawnDimension() != Level.END) {
-                        // serverplayer.getCapability(PlayerDataCapability.INSTANCE, null).ifPresent(cap -> {
-                        //     RespawnData data = new RespawnData(serverplayer.getRespawnDimension(),
-                        //             serverplayer.getRespawnPosition(), serverplayer.getRespawnAngle());
-                        //     cap.setValue(data);
-                        // });
+                    if (serverplayer.getRespawnDimension() != Level.END) {
+                        var p = (IServerPlayerMixin)(Object) serverplayer;
+                        p.end_respawn_anchor$setPreBlockPos(serverplayer.getRespawnPosition());
+                        p.end_respawn_anchor$setPreRespawnDimension(serverplayer.getRespawnDimension());
+                        p.end_respawn_anchor$setPreRespawnAngle(serverplayer.getRespawnAngle());
                     }
                     serverplayer.setRespawnPosition(level.dimension(), blockPos, 0.0F, false, true);
                     level.playSound(null, (double) blockPos.getX() + 0.5D, (double) blockPos.getY() + 0.5D,

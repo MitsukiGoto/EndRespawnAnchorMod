@@ -2,13 +2,12 @@
     "schemaVersion": 1,
     "id": "end_respawn_anchor",
     "version": "${version}",
-  
+    "accessWidener": "end_respawn_anchor.accesswidener",
     "name": "EndRespawnAnchor",
     "description": "",
     "authors": [
       "Mikndesu"
     ],
-    "icon": "assets/end_respawn_anchor/icon.png",
     "contact": {
       "homepage": "https://github.com/Mikndesu/",
       "issues": "https://github.com/Mikndesu/EndRespawnAnchorMod/issues",
@@ -21,7 +20,6 @@
         "com.github.mikn.end_respawn_anchor.EndRespawnAnchor"
       ],
       "modmenu": [
-        "com.github.mikn.end_respawn_anchor.client.screen.EndRespawnAnchorModMenuIntegration"
       ]
     },
     "mixins": [
