@@ -118,7 +118,7 @@ public class ServerPlayerMixin implements IServerPlayerMixin {
     }
 
     @Inject(method= "restoreFrom(Lnet/minecraft/server/level/ServerPlayer;Z)V", at=@At("TAIL"))
-    private void setEnd_respawn_anchor$restoreFrom(ServerPlayer that, boolean keepEverything, CallbackInfo ci) {
+    private void end_respawn_anchor$restoreFrom(ServerPlayer that, boolean keepEverything, CallbackInfo ci) {
         var newPlayer = (IServerPlayerMixin)(Object) this;
         var oldPlayer = (IServerPlayerMixin)(Object) that;
         if(oldPlayer.end_respawn_anchor$getPreRespawnDimension()!=null) {
