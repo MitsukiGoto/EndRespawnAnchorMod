@@ -21,8 +21,8 @@
 
 package com.github.mikn.end_respawn_anchor.asm.mixin;
 
-import com.github.mikn.end_respawn_anchor.capabilities.PlayerDataCapability;
-import com.github.mikn.end_respawn_anchor.config.EndRespawnAnchorConfig;
+import com.github.mikn.end_respawn_anchor.EndRespawnAnchor;
+import com.github.mikn.end_respawn_anchor.IServerPlayerMixin;
 import com.github.mikn.end_respawn_anchor.init.BlockInit;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
@@ -34,6 +34,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+
+import java.util.Optional;
+
 import org.spongepowered.asm.mixin.Debug;
 import org.spongepowered.asm.mixin.Mixin;
 
@@ -48,24 +51,23 @@ public class PlayerListMixin {
 
     @Redirect(method= "respawn(Lnet/minecraft/server/level/ServerPlayer;Z)Lnet/minecraft/server/level/ServerPlayer;", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;getRespawnPosition()Lnet/minecraft/core/BlockPos;"))
     private BlockPos redirect_position(ServerPlayer player) {
-        player.reviveCaps();
-        var cap = player.getCapability(PlayerDataCapability.INSTANCE, null);
-        return shouldReplaceSpawnInfo(player) && cap.isPresent() ? cap.resolve().get().getRespawnData().blockPos(): player.getRespawnPosition();
+        var p = (IServerPlayerMixin)(Object) player;
+        Optional<BlockPos> optional = Optional.of(p.end_respawn_anchor$getPreBlockPos());
+        return shouldReplaceSpawnInfo(player) && optional.isPresent() ? optional.get() : player.getRespawnPosition();
     }
     
     @Redirect(method= "respawn(Lnet/minecraft/server/level/ServerPlayer;Z)Lnet/minecraft/server/level/ServerPlayer;", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;getRespawnAngle()F"))
     private float redirect_f(ServerPlayer player) {
-        player.reviveCaps();
-        var cap = player.getCapability(PlayerDataCapability.INSTANCE, null);
-        return shouldReplaceSpawnInfo(player) && cap.isPresent() ? cap.resolve().get().getRespawnData().respawnAngle(): player.getRespawnAngle();
+        var p = (IServerPlayerMixin)(Object) player;
+        Optional<BlockPos> optional = Optional.of(p.end_respawn_anchor$getPreBlockPos());
+        return shouldReplaceSpawnInfo(player) && optional.isPresent() ? p.end_respawn_anchor$getPreRespawnAngle() : player.getRespawnAngle();
     }
 
     @Redirect(method = "respawn(Lnet/minecraft/server/level/ServerPlayer;Z)Lnet/minecraft/server/level/ServerPlayer;", at = @At(value = "INVOKE", target ="Lnet/minecraft/server/MinecraftServer;getLevel(Lnet/minecraft/resources/ResourceKey;)Lnet/minecraft/server/level/ServerLevel;"))
     private ServerLevel redirect_serverlevel(MinecraftServer server, ResourceKey<Level> pDimension, ServerPlayer player, boolean pKeepEverything) {
-        player.reviveCaps();
-        var cap = player.getCapability(PlayerDataCapability.INSTANCE, null);
-        ResourceKey<Level> level = cap.isPresent()? cap.resolve().get().getRespawnData().dimension() : Level.OVERWORLD;
-        return server.getLevel(shouldReplaceSpawnInfo(player) ? level : pDimension);
+        var p = (IServerPlayerMixin)(Object) player;
+        Optional<BlockPos> optional = Optional.of(p.end_respawn_anchor$getPreBlockPos());
+        return server.getLevel(shouldReplaceSpawnInfo(player) && optional.isPresent() ? p.end_respawn_anchor$getPreRespawnDimension() : pDimension);
     }
 
     @Redirect(method = "respawn(Lnet/minecraft/server/level/ServerPlayer;Z)Lnet/minecraft/server/level/ServerPlayer;", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;setRespawnPosition(Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/core/BlockPos;FZZ)V"))
@@ -79,12 +81,12 @@ public class PlayerListMixin {
 
     @Redirect(method = "respawn(Lnet/minecraft/server/level/ServerPlayer;Z)Lnet/minecraft/server/level/ServerPlayer;", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;is(Lnet/minecraft/world/level/block/Block;)Z"))
     private boolean redirect_is(BlockState blockState, Block block) {
-        return blockState.is(Blocks.RESPAWN_ANCHOR) || blockState.is(BlockInit.END_RESPAWN_ANCHOR.get());
+        return blockState.is(Blocks.RESPAWN_ANCHOR) || blockState.is(BlockInit.END_RESPAWN_ANCHOR);
     }
 
     @Unique
     private boolean shouldReplaceSpawnInfo(ServerPlayer player) {
         // Both Respawn Dimension and position should be changed when players have set their spawn point in the End.
-        return EndRespawnAnchorConfig.shouldChangeSpawnInfo.get() && player.isChangingDimension() && player.level().dimension() == Level.END && player.getRespawnDimension() == Level.END;
+        return EndRespawnAnchor.HOLDER.shouldChangeSpawnInfo && player.isChangingDimension() && player.level().dimension() == Level.END && player.getRespawnDimension() == Level.END;
     }
 }
