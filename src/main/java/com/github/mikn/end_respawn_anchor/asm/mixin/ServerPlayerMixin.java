@@ -90,26 +90,28 @@ public class ServerPlayerMixin implements IServerPlayerMixin {
         return this.end_respawn_anchor$preSpawnAngle;
     }
 
-    @Inject(method = "addAdditionalSaveData(Lnet/minecraft/nbt/CompoundTag;)V", at=@At("TAIL"))
+    @Inject(method = "addAdditionalSaveData(Lnet/minecraft/nbt/CompoundTag;)V", at = @At("TAIL"))
     private void end_respawn_anchor$addAdditionalSaveData(CompoundTag compound, CallbackInfo ci) {
-        var p = (IServerPlayerMixin)(Object) this;
-        if(p.end_respawn_anchor$getPreBlockPos() != null) {
+        var p = (IServerPlayerMixin) (Object) this;
+        if (p.end_respawn_anchor$getPreBlockPos() != null) {
             CompoundTag element = new CompoundTag();
             element.putInt(NBT_KEY_PLAYER_SPAWN_POS_X, p.end_respawn_anchor$getPreBlockPos().getX());
             element.putInt(NBT_KEY_PLAYER_SPAWN_POS_Y, p.end_respawn_anchor$getPreBlockPos().getY());
             element.putInt(NBT_KEY_PLAYER_SPAWN_POS_Z, p.end_respawn_anchor$getPreBlockPos().getZ());
-            element.putString(NBT_KEY_PLAYER_SPAWN_DIMENSION, p.end_respawn_anchor$getPreRespawnDimension().location().toString());
+            element.putString(NBT_KEY_PLAYER_SPAWN_DIMENSION,
+                    p.end_respawn_anchor$getPreRespawnDimension().location().toString());
             element.putFloat(NBT_KEY_PLAYER_SPAWN_ANGLE, p.end_respawn_anchor$getPreRespawnAngle());
             compound.put(EndRespawnAnchor.MODID, element);
         }
     }
 
-    @Inject(method = "readAdditionalSaveData(Lnet/minecraft/nbt/CompoundTag;)V", at=@At("TAIL"))
+    @Inject(method = "readAdditionalSaveData(Lnet/minecraft/nbt/CompoundTag;)V", at = @At("TAIL"))
     private void end_respawn_anchor$readAdditionalSaveData(CompoundTag compound, CallbackInfo ci) {
-        if(compound.contains(EndRespawnAnchor.MODID)) {
-            var p = (IServerPlayerMixin)(Object) this;
+        if (compound.contains(EndRespawnAnchor.MODID)) {
+            var p = (IServerPlayerMixin) (Object) this;
             CompoundTag tag = compound.getCompound(EndRespawnAnchor.MODID);
-            p.end_respawn_anchor$setPreBlockPos(new BlockPos(tag.getInt(NBT_KEY_PLAYER_SPAWN_POS_X), tag.getInt(NBT_KEY_PLAYER_SPAWN_POS_Y), tag.getInt(NBT_KEY_PLAYER_SPAWN_POS_Z)));
+            p.end_respawn_anchor$setPreBlockPos(new BlockPos(tag.getInt(NBT_KEY_PLAYER_SPAWN_POS_X),
+                    tag.getInt(NBT_KEY_PLAYER_SPAWN_POS_Y), tag.getInt(NBT_KEY_PLAYER_SPAWN_POS_Z)));
             p.end_respawn_anchor$setPreRespawnDimension(Level.RESOURCE_KEY_CODEC
                     .parse(NbtOps.INSTANCE, tag.get(NBT_KEY_PLAYER_SPAWN_DIMENSION))
                     .resultOrPartial(EndRespawnAnchor.LOGGER::error).orElse(Level.OVERWORLD));
@@ -117,11 +119,11 @@ public class ServerPlayerMixin implements IServerPlayerMixin {
         }
     }
 
-    @Inject(method= "restoreFrom(Lnet/minecraft/server/level/ServerPlayer;Z)V", at=@At("TAIL"))
+    @Inject(method = "restoreFrom(Lnet/minecraft/server/level/ServerPlayer;Z)V", at = @At("TAIL"))
     private void end_respawn_anchor$restoreFrom(ServerPlayer that, boolean keepEverything, CallbackInfo ci) {
-        var newPlayer = (IServerPlayerMixin)(Object) this;
-        var oldPlayer = (IServerPlayerMixin)(Object) that;
-        if(oldPlayer.end_respawn_anchor$getPreRespawnDimension()!=null) {
+        var newPlayer = (IServerPlayerMixin) (Object) this;
+        var oldPlayer = (IServerPlayerMixin) (Object) that;
+        if (oldPlayer.end_respawn_anchor$getPreRespawnDimension() != null) {
             newPlayer.end_respawn_anchor$setPreBlockPos(oldPlayer.end_respawn_anchor$getPreBlockPos());
             newPlayer.end_respawn_anchor$setPreRespawnDimension(oldPlayer.end_respawn_anchor$getPreRespawnDimension());
             newPlayer.end_respawn_anchor$setPreRespawnAngle(oldPlayer.end_respawn_anchor$getPreRespawnAngle());

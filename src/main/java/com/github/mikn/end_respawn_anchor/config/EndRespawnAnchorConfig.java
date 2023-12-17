@@ -26,11 +26,10 @@ import com.github.mikn.end_respawn_anchor.EndRespawnAnchor;
 import me.shedaniel.autoconfig.ConfigData;
 import me.shedaniel.autoconfig.annotation.Config;
 
-
 @Config(name = EndRespawnAnchor.MODID)
 public class EndRespawnAnchorConfig implements ConfigData {
 
     public boolean isExplode = true;
-    public boolean shouldChangeSpawnInfo = true;
+    public boolean shouldOverrideSpawnData = true;
 
 }

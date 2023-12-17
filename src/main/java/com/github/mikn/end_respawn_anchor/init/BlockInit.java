@@ -29,7 +29,7 @@ import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.world.level.material.MapColor;
 
 public class BlockInit {
-        public static final Block END_RESPAWN_ANCHOR = new EndRespawnAnchorBlock(
+    public static final Block END_RESPAWN_ANCHOR = new EndRespawnAnchorBlock(
             BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK)
                     .instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(50.0F, 1200.0F)
                     .lightLevel((p_152639_) -> {

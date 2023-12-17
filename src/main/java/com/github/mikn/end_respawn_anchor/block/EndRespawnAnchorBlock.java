@@ -96,7 +96,7 @@ public class EndRespawnAnchorBlock extends Block {
                 if (serverplayer.getRespawnDimension() != level.dimension()
                         || !blockPos.equals(serverplayer.getRespawnPosition())) {
                     if (serverplayer.getRespawnDimension() != Level.END) {
-                        var p = (IServerPlayerMixin)(Object) serverplayer;
+                        var p = (IServerPlayerMixin) (Object) serverplayer;
                         p.end_respawn_anchor$setPreBlockPos(serverplayer.getRespawnPosition());
                         p.end_respawn_anchor$setPreRespawnDimension(serverplayer.getRespawnDimension());
                         p.end_respawn_anchor$setPreRespawnAngle(serverplayer.getRespawnAngle());

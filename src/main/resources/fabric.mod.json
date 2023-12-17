@@ -4,7 +4,7 @@
     "version": "${version}",
     "accessWidener": "end_respawn_anchor.accesswidener",
     "name": "EndRespawnAnchor",
-    "description": "",
+    "description": "Add an EndRespawnAnchor.",
     "authors": [
       "Mikndesu"
     ],

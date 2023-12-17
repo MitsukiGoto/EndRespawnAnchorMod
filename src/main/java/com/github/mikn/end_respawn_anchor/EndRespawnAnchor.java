@@ -44,12 +44,15 @@ public class EndRespawnAnchor implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        Registry.register(BuiltInRegistries.BLOCK, new ResourceLocation(EndRespawnAnchor.MODID, "end_respawn_anchor"), BlockInit.END_RESPAWN_ANCHOR);
-        Registry.register(BuiltInRegistries.ITEM, new ResourceLocation(EndRespawnAnchor.MODID, "end_respawn_anchor"), ItemInit.END_RESPAWN_ANCHOR);
+        Registry.register(BuiltInRegistries.BLOCK, new ResourceLocation(EndRespawnAnchor.MODID, "end_respawn_anchor"),
+                BlockInit.END_RESPAWN_ANCHOR);
+        Registry.register(BuiltInRegistries.ITEM, new ResourceLocation(EndRespawnAnchor.MODID, "end_respawn_anchor"),
+                ItemInit.END_RESPAWN_ANCHOR);
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS).register(content -> {
             content.accept(ItemInit.END_RESPAWN_ANCHOR);
         });
     }
+
     static {
         HOLDER = AutoConfig.register(EndRespawnAnchorConfig.class, JanksonConfigSerializer::new).getConfig();
     }
