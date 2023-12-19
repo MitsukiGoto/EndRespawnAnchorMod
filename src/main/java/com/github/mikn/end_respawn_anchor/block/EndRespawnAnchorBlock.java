@@ -21,9 +21,9 @@
 
 package com.github.mikn.end_respawn_anchor.block;
 
-import com.github.mikn.end_respawn_anchor.EndRespawnAnchor;
+import com.github.mikn.end_respawn_anchor.RespawnData;
+import com.github.mikn.end_respawn_anchor.capabilities.PlayerDataCapability;
 import com.github.mikn.end_respawn_anchor.config.EndRespawnAnchorConfig;
-import com.github.mikn.end_respawn_anchor.util.StoredRespawnPosition;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -59,9 +59,9 @@ import java.util.Random;
 
 public class EndRespawnAnchorBlock extends Block {
     public static final IntegerProperty CHARGE = BlockStateProperties.RESPAWN_ANCHOR_CHARGES;
-    private static final ImmutableList<Vec3i> RESPAWN_HORIZONTAL_OFFSETS = ImmutableList.of(new Vec3i(0, 0, -1),
-            new Vec3i(-1, 0, 0), new Vec3i(0, 0, 1), new Vec3i(1, 0, 0), new Vec3i(-1, 0, -1), new Vec3i(1, 0, -1),
-            new Vec3i(-1, 0, 1), new Vec3i(1, 0, 1));
+    private static final ImmutableList<Vec3i> RESPAWN_HORIZONTAL_OFFSETS =
+            ImmutableList.of(new Vec3i(0, 0, -1), new Vec3i(-1, 0, 0), new Vec3i(0, 0, 1), new Vec3i(1, 0, 0),
+                    new Vec3i(-1, 0, -1), new Vec3i(1, 0, -1), new Vec3i(-1, 0, 1), new Vec3i(1, 0, 1));
     private static final ImmutableList<Vec3i> RESPAWN_OFFSETS = (new ImmutableList.Builder<Vec3i>())
             .addAll(RESPAWN_HORIZONTAL_OFFSETS).addAll(RESPAWN_HORIZONTAL_OFFSETS.stream().map(Vec3i::below).iterator())
             .addAll(RESPAWN_HORIZONTAL_OFFSETS.stream().map(Vec3i::above).iterator()).add(new Vec3i(0, 1, 0)).build();
@@ -96,14 +96,16 @@ public class EndRespawnAnchorBlock extends Block {
                 if (serverplayer.getRespawnDimension() != level.dimension()
                         || !blockPos.equals(serverplayer.getRespawnPosition())) {
                     if (serverplayer.getRespawnDimension() != Level.END) {
-                        EndRespawnAnchor.spawnPositions.put(serverplayer.getUUID(),
-                                new StoredRespawnPosition(serverplayer.getRespawnDimension(),
-                                        serverplayer.getRespawnPosition(), serverplayer.getRespawnAngle()));
+                        serverplayer.getCapability(PlayerDataCapability.INSTANCE, null).ifPresent(cap -> {
+                            RespawnData data = new RespawnData(serverplayer.getRespawnDimension(),
+                                    serverplayer.getRespawnPosition(), serverplayer.getRespawnAngle());
+                            cap.setValue(data);
+                        });
                     }
                     serverplayer.setRespawnPosition(level.dimension(), blockPos, 0.0F, false, true);
                     level.playSound(null, (double) blockPos.getX() + 0.5D, (double) blockPos.getY() + 0.5D,
-                            (double) blockPos.getZ() + 0.5D, SoundEvents.RESPAWN_ANCHOR_SET_SPAWN, SoundSource.BLOCKS,
-                            1.0F, 1.0F);
+                            (double) blockPos.getZ() + 0.5D, SoundEvents.RESPAWN_ANCHOR_SET_SPAWN, SoundSource.BLOCKS, 1.0F,
+                            1.0F);
                     return InteractionResult.SUCCESS;
                 }
             }
@@ -115,8 +117,7 @@ public class EndRespawnAnchorBlock extends Block {
         if (blockState.getValue(CHARGE) != 0) {
             if (random.nextInt(100) == 0) {
                 level.playSound(null, (double) blockPos.getX() + 0.5D, (double) blockPos.getY() + 0.5D,
-                        (double) blockPos.getZ() + 0.5D, SoundEvents.RESPAWN_ANCHOR_AMBIENT, SoundSource.BLOCKS, 1.0F,
-                        1.0F);
+                        (double) blockPos.getZ() + 0.5D, SoundEvents.RESPAWN_ANCHOR_AMBIENT, SoundSource.BLOCKS, 1.0F, 1.0F);
             }
             double d0 = (double) blockPos.getX() + 0.5D + (0.5D - random.nextDouble());
             double d1 = (double) blockPos.getY() + 1.0D;
@@ -126,14 +127,13 @@ public class EndRespawnAnchorBlock extends Block {
         }
     }
 
-    public static Optional<Vec3> findStandUpPosition(EntityType<?> p_55840_, CollisionGetter p_55841_,
-            BlockPos p_55842_) {
+    public static Optional<Vec3> findStandUpPosition(EntityType<?> p_55840_, CollisionGetter p_55841_, BlockPos p_55842_) {
         Optional<Vec3> optional = findStandUpPosition(p_55840_, p_55841_, p_55842_, true);
         return optional.isPresent() ? optional : findStandUpPosition(p_55840_, p_55841_, p_55842_, false);
     }
 
-    private static Optional<Vec3> findStandUpPosition(EntityType<?> p_55844_, CollisionGetter p_55845_,
-            BlockPos p_55846_, boolean p_55847_) {
+    private static Optional<Vec3> findStandUpPosition(EntityType<?> p_55844_, CollisionGetter p_55845_, BlockPos p_55846_,
+            boolean p_55847_) {
         BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
         for (Vec3i vec3i : RESPAWN_OFFSETS) {
             blockpos$mutableblockpos.set(p_55846_).move(vec3i);
@@ -155,8 +155,8 @@ public class EndRespawnAnchorBlock extends Block {
 
     public static void charge(Level level, BlockPos blockPos, BlockState blockState) {
         level.setBlock(blockPos, blockState.setValue(CHARGE, blockState.getValue(CHARGE) + 1), 3);
-        level.playSound(null, (double) blockPos.getX() + 0.5D, (double) blockPos.getY() + 0.5D,
-                (double) blockPos.getZ() + 0.5D, SoundEvents.RESPAWN_ANCHOR_CHARGE, SoundSource.BLOCKS, 1.0F, 1.0F);
+        level.playSound(null, (double) blockPos.getX() + 0.5D, (double) blockPos.getY() + 0.5D, (double) blockPos.getZ() + 0.5D,
+                SoundEvents.RESPAWN_ANCHOR_CHARGE, SoundSource.BLOCKS, 1.0F, 1.0F);
     }
 
     private static boolean isRespawnFuel(ItemStack itemStack) {
@@ -178,15 +178,15 @@ public class EndRespawnAnchorBlock extends Block {
         });
         final boolean flag1 = flag || level.getFluidState(blockPos.above()).is(FluidTags.WATER);
         ExplosionDamageCalculator explosiondamagecalculator = new ExplosionDamageCalculator() {
-            public Optional<Float> getBlockExplosionResistance(Explosion p_55904_, BlockGetter p_55905_,
-                    BlockPos p_55906_, BlockState p_55907_, FluidState p_55908_) {
+            public Optional<Float> getBlockExplosionResistance(Explosion p_55904_, BlockGetter p_55905_, BlockPos p_55906_,
+                    BlockState p_55907_, FluidState p_55908_) {
                 return p_55906_.equals(blockPos) && flag1 ? Optional.of(Blocks.WATER.getExplosionResistance())
                         : super.getBlockExplosionResistance(p_55904_, p_55905_, p_55906_, p_55907_, p_55908_);
             }
         };
         Vec3 vec3 = blockPos.getCenter();
-        level.explode((Entity) null, level.damageSources().badRespawnPointExplosion(vec3), explosiondamagecalculator,
-                vec3, 5.0F, true, Level.ExplosionInteraction.BLOCK);
+        level.explode((Entity) null, level.damageSources().badRespawnPointExplosion(vec3), explosiondamagecalculator, vec3, 5.0F,
+                true, Level.ExplosionInteraction.BLOCK);
     }
 
     private static boolean isWaterThatWouldFlow(BlockPos blockPos, Level level) {

@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2022 Mikndesu
+ Copyright (c) 2023 Mikndesu
 
  Permission is hereby granted, free of charge, to any person obtaining a copy of
  this software and associated documentation files (the "Software"), to deal in
@@ -19,26 +19,19 @@
  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.github.mikn.end_respawn_anchor.util;
+package com.github.mikn.end_respawn_anchor.capabilities;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.level.Level;
+import java.util.Optional;
 
-public record StoredRespawnPosition(ResourceKey<Level> dimension, BlockPos blockPos, float respawnAngle) {
-    @Override
-    public String toString() {
-        return " BlockPos: " + blockPos + " in Dimension: " + provideDimension(dimension);
-    }
+import com.github.mikn.end_respawn_anchor.RespawnData;
 
-    private String provideDimension(ResourceKey<Level> level) {
-        if (level == Level.OVERWORLD) {
-            return "the overworld";
-        } else if (level == Level.NETHER) {
-            return "the nether";
-        } else if (level == Level.END) {
-            return "the end";
-        }
-        return "Other dimension";
-    }
+import net.minecraft.nbt.CompoundTag;
+import net.minecraftforge.common.capabilities.AutoRegisterCapability;
+import net.minecraftforge.common.util.INBTSerializable;
+
+@AutoRegisterCapability
+public interface IPlayerDataCapability extends INBTSerializable<CompoundTag> {
+    Optional<RespawnData> getRespawnData();
+
+    void setValue(RespawnData respawnData);
 }
