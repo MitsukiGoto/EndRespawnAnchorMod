@@ -26,9 +26,11 @@ import com.github.mikn.end_respawn_anchor.capabilities.PlayerDataCapabilityAttac
 import com.github.mikn.end_respawn_anchor.config.EndRespawnAnchorConfig;
 import com.github.mikn.end_respawn_anchor.init.BlockInit;
 import com.github.mikn.end_respawn_anchor.init.ItemInit;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraft.world.level.storage.LevelResource;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.CreativeModeTabEvent;
@@ -42,6 +44,8 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import java.util.Optional;
+import java.nio.file.Path;
 
 @Mod(EndRespawnAnchor.MODID)
 public class EndRespawnAnchor {
@@ -78,5 +82,21 @@ public class EndRespawnAnchor {
         event.getOriginal().getCapability(PlayerDataCapability.INSTANCE).ifPresent(cap -> event.getEntity()
                 .getCapability(PlayerDataCapability.INSTANCE).ifPresent(c -> c.deserializeNBT(cap.serializeNBT())));
         event.getOriginal().invalidateCaps();
+    }
+
+    @SubscribeEvent
+    public void onPlayerLogIn(final PlayerEvent.PlayerLoggedInEvent event) {
+        Entity entity = event.getEntity();
+        Path path = entity.getServer().getWorldPath(LevelResource.LEVEL_DATA_FILE).getParent()
+                .resolve("data/end_respawn_anchor.json");
+        if (path.toFile().exists() && entity instanceof ServerPlayer serverplayer) {
+            serverplayer.getCapability(PlayerDataCapability.INSTANCE, null).ifPresent(cap -> {
+                Optional<RespawnData> data = ParseLegacyFile.getMatchingDataIfExists(path, serverplayer.getUUID());
+                data.ifPresent(d -> {
+                    cap.setValue(d);
+                    LOGGER.info("{}'s respawn data is successfully converted", serverplayer.getName());
+                });
+            });
+        }
     }
 }
