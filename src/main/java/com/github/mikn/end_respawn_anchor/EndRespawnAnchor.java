@@ -29,11 +29,9 @@ import com.github.mikn.end_respawn_anchor.init.ItemInit;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.level.storage.LevelResource;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
-import net.minecraftforge.event.CreativeModeTabEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -54,19 +52,11 @@ public class EndRespawnAnchor {
 
     public EndRespawnAnchor() {
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
-        bus.addListener(this::registerCreativeTabs);
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, EndRespawnAnchorConfig.SPEC,
                 "end_respawn_anchor-common.toml");
         BlockInit.BLOCKS.register(bus);
         ItemInit.ITEMS.register(bus);
         MinecraftForge.EVENT_BUS.register(this);
-    }
-
-    @SubscribeEvent
-    public void registerCreativeTabs(final CreativeModeTabEvent.BuildContents evt) {
-        if (evt.getTab() == CreativeModeTabs.FUNCTIONAL_BLOCKS) {
-            evt.accept(ItemInit.END_RESPAWN_ANCHOR);
-        }
     }
 
     @SubscribeEvent
