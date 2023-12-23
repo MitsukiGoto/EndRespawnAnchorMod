@@ -31,8 +31,11 @@ public class EndRespawnAnchorConfig {
 
     static {
         BUILDER.push("Config for EndRespawnAnchor Mod");
-        isExplode = BUILDER.comment("This defines whether it explodes or not in dimensions other than the End.").define("isExplode", false);
-        shouldChangeSpawnInfo = BUILDER.comment("This defines whether respawn position should be changed in particular situation. \n See description for more details.").define("shouldChangeSpawnInfo", true);
+        isExplode = BUILDER.comment("This defines whether it explodes or not in dimensions other than the End.")
+                .define("isExplode", false);
+        shouldChangeSpawnInfo = BUILDER.comment(
+                "This defines whether respawn position should be changed in particular situation. \n See description for more details.")
+                .define("shouldChangeSpawnInfo", true);
         BUILDER.pop();
         SPEC = BUILDER.build();
     }

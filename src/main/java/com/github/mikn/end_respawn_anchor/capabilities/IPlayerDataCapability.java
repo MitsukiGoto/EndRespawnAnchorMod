@@ -30,5 +30,6 @@ import net.minecraftforge.common.util.INBTSerializable;
 @AutoRegisterCapability
 public interface IPlayerDataCapability extends INBTSerializable<CompoundTag> {
     RespawnData getRespawnData();
+
     void setValue(RespawnData respawnData);
 }

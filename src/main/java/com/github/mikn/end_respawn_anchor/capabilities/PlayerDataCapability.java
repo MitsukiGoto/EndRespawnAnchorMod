@@ -35,8 +35,7 @@ import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 
 public class PlayerDataCapability implements IPlayerDataCapability {
-    public static final Capability<IPlayerDataCapability> INSTANCE = CapabilityManager.get(new CapabilityToken<>() {
-    });
+    public static final Capability<IPlayerDataCapability> INSTANCE = CapabilityManager.get(new CapabilityToken<>() {});
     public static final String NBT_KEY_PLAYER_SPAWN_DIMENSION = "preSpawnDimension";
     public static final String NBT_KEY_PLAYER_SPAWN_POS_X = "preSpawnPosX";
     public static final String NBT_KEY_PLAYER_SPAWN_POS_Y = "preSpawnPosY";
@@ -68,8 +67,7 @@ public class PlayerDataCapability implements IPlayerDataCapability {
 
     @Override
     public void deserializeNBT(CompoundTag nbt) {
-        ResourceKey<Level> dimension = Level.RESOURCE_KEY_CODEC
-                .parse(NbtOps.INSTANCE, nbt.get(NBT_KEY_PLAYER_SPAWN_DIMENSION))
+        ResourceKey<Level> dimension = Level.RESOURCE_KEY_CODEC.parse(NbtOps.INSTANCE, nbt.get(NBT_KEY_PLAYER_SPAWN_DIMENSION))
                 .resultOrPartial(EndRespawnAnchor.LOGGER::error).orElse(Level.OVERWORLD);
         int posX = nbt.getInt(NBT_KEY_PLAYER_SPAWN_POS_X);
         int posY = nbt.getInt(NBT_KEY_PLAYER_SPAWN_POS_Y);

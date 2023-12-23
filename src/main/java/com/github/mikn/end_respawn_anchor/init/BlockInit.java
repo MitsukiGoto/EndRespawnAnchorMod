@@ -33,12 +33,12 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
 public class BlockInit {
-    public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS,
-            EndRespawnAnchor.MODID);
-    public static final RegistryObject<Block> END_RESPAWN_ANCHOR = BLOCKS.register("end_respawn_anchor",
-            () -> new EndRespawnAnchorBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK)
-                    .instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(50.0F, 1200.0F)
-                    .lightLevel((p_152639_) -> {
-                        return RespawnAnchorBlock.getScaledChargeLevel(p_152639_, 15);
-                    })));
+        public static final DeferredRegister<Block> BLOCKS =
+                        DeferredRegister.create(ForgeRegistries.BLOCKS, EndRespawnAnchor.MODID);
+        public static final RegistryObject<Block> END_RESPAWN_ANCHOR = BLOCKS.register("end_respawn_anchor",
+                        () -> new EndRespawnAnchorBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK)
+                                        .instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops()
+                                        .strength(50.0F, 1200.0F).lightLevel((p_152639_) -> {
+                                                return RespawnAnchorBlock.getScaledChargeLevel(p_152639_, 15);
+                                        })));
 }

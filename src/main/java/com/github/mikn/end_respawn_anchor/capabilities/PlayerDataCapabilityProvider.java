@@ -36,27 +36,27 @@ import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 
 public class PlayerDataCapabilityProvider implements ICapabilityProvider, INBTSerializable<CompoundTag> {
-        // "era" is an aggrevation for End Respawn Anchor
-        public static final ResourceLocation IDENTIFIER = new ResourceLocation(EndRespawnAnchor.MODID, "eracap");
-        private final IPlayerDataCapability backend = new PlayerDataCapability();
-        private final LazyOptional<IPlayerDataCapability> optionalData = LazyOptional.of(() -> backend);
+    // "era" is an aggrevation for End Respawn Anchor
+    public static final ResourceLocation IDENTIFIER = new ResourceLocation(EndRespawnAnchor.MODID, "eracap");
+    private final IPlayerDataCapability backend = new PlayerDataCapability();
+    private final LazyOptional<IPlayerDataCapability> optionalData = LazyOptional.of(() -> backend);
 
-        @Override
-        public CompoundTag serializeNBT() {
-            return this.backend.serializeNBT();
-        }
-
-        @Override
-        public void deserializeNBT(CompoundTag nbt) {
-            this.backend.deserializeNBT(nbt);
-        }
-
-        @Override
-        public <T> @NotNull LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
-            return PlayerDataCapability.INSTANCE.orEmpty(cap, optionalData);
-        }
-
-        void invalidate() {
-            this.optionalData.invalidate();
-        }
+    @Override
+    public CompoundTag serializeNBT() {
+        return this.backend.serializeNBT();
     }
+
+    @Override
+    public void deserializeNBT(CompoundTag nbt) {
+        this.backend.deserializeNBT(nbt);
+    }
+
+    @Override
+    public <T> @NotNull LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
+        return PlayerDataCapability.INSTANCE.orEmpty(cap, optionalData);
+    }
+
+    void invalidate() {
+        this.optionalData.invalidate();
+    }
+}

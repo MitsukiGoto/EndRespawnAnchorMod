@@ -75,8 +75,8 @@ public class EndRespawnAnchor {
     @SubscribeEvent
     public void onPlayerClone(final PlayerEvent.Clone event) {
         event.getOriginal().reviveCaps();
-        event.getOriginal().getCapability(PlayerDataCapability.INSTANCE).ifPresent(cap ->
-                event.getEntity().getCapability(PlayerDataCapability.INSTANCE).ifPresent(c -> c.deserializeNBT(cap.serializeNBT())));
+        event.getOriginal().getCapability(PlayerDataCapability.INSTANCE).ifPresent(cap -> event.getEntity()
+                .getCapability(PlayerDataCapability.INSTANCE).ifPresent(c -> c.deserializeNBT(cap.serializeNBT())));
         event.getOriginal().invalidateCaps();
     }
 }
