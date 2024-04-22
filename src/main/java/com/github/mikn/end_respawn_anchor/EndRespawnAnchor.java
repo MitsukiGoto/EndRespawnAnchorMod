@@ -29,33 +29,28 @@ import com.github.mikn.end_respawn_anchor.init.ItemInit;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTabs;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.AttachCapabilitiesEvent;
-import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModLoadingContext;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 @Mod(EndRespawnAnchor.MODID)
 public class EndRespawnAnchor {
     public static final String MODID = "end_respawn_anchor";
     public static final Logger LOGGER = LogManager.getLogger("EndRespawnAnchor/Main");
 
-    public EndRespawnAnchor() {
-        IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
-        bus.addListener(this::registerCreativeTabs);
+    public EndRespawnAnchor(@NonNull IEventBus modEventBus) {
+        modEventBus.addListener(this::registerCreativeTabs);
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, EndRespawnAnchorConfig.SPEC,
                 "end_respawn_anchor-common.toml");
-        BlockInit.BLOCKS.register(bus);
-        ItemInit.ITEMS.register(bus);
-        MinecraftForge.EVENT_BUS.register(this);
+        BlockInit.BLOCKS.register(modEventBus);
+        ItemInit.ITEMS.register(modEventBus);
     }
 
     @SubscribeEvent
@@ -75,8 +70,8 @@ public class EndRespawnAnchor {
     @SubscribeEvent
     public void onPlayerClone(final PlayerEvent.Clone event) {
         event.getOriginal().reviveCaps();
-        event.getOriginal().getCapability(PlayerDataCapability.INSTANCE).ifPresent(cap ->
-                event.getEntity().getCapability(PlayerDataCapability.INSTANCE).ifPresent(c -> c.deserializeNBT(cap.serializeNBT())));
+        event.getOriginal().getCapability(PlayerDataCapability.INSTANCE).ifPresent(cap -> event.getEntity()
+                .getCapability(PlayerDataCapability.INSTANCE).ifPresent(c -> c.deserializeNBT(cap.serializeNBT())));
         event.getOriginal().invalidateCaps();
     }
 }

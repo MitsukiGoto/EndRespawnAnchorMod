@@ -21,18 +21,21 @@
 
 package com.github.mikn.end_respawn_anchor.config;
 
-import net.minecraftforge.common.ForgeConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
 public class EndRespawnAnchorConfig {
-    public static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
-    public static final ForgeConfigSpec SPEC;
-    public static final ForgeConfigSpec.ConfigValue<Boolean> isExplode;
-    public static final ForgeConfigSpec.ConfigValue<Boolean> shouldChangeSpawnInfo;
+    public static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
+    public static final ModConfigSpec SPEC;
+    public static final ModConfigSpec.ConfigValue<Boolean> isExplode;
+    public static final ModConfigSpec.ConfigValue<Boolean> shouldChangeSpawnInfo;
 
     static {
         BUILDER.push("Config for EndRespawnAnchor Mod");
-        isExplode = BUILDER.comment("This defines whether it explodes or not in dimensions other than the End.").define("isExplode", false);
-        shouldChangeSpawnInfo = BUILDER.comment("This defines whether respawn position should be changed in particular situation. \n See description for more details.").define("shouldChangeSpawnInfo", true);
+        isExplode = BUILDER.comment("This defines whether it explodes or not in dimensions other than the End.")
+                .define("isExplode", false);
+        shouldChangeSpawnInfo = BUILDER.comment(
+                "This defines whether respawn position should be changed in particular situation. \n See description for more details.")
+                .define("shouldChangeSpawnInfo", true);
         BUILDER.pop();
         SPEC = BUILDER.build();
     }
