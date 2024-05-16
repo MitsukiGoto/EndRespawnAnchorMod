@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2022 Mikndesu
+ Copyright (c) 2024 Mikndesu
 
  Permission is hereby granted, free of charge, to any person obtaining a copy of
  this software and associated documentation files (the "Software"), to deal in
@@ -19,11 +19,26 @@
  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.github.mikn.end_respawn_anchor;
+package com.github.mikn.end_respawn_anchor.init;
+
+import com.github.mikn.end_respawn_anchor.EndRespawnAnchor;
+import com.github.mikn.end_respawn_anchor.data_attachment.RespawnData;
+
+import java.util.function.Supplier;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.attachment.AttachmentType;
+import net.neoforged.neoforge.registries.DeferredRegister;
+import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
-public record RespawnData(ResourceKey<Level> dimension, BlockPos blockPos, float respawnAngle) {
+public class DataAttachmentInit {
+        public static final DeferredRegister<AttachmentType<?>> ATTACHMENT_TYPES = DeferredRegister
+                        .create(NeoForgeRegistries.Keys.ATTACHMENT_TYPES, EndRespawnAnchor.MODID);
+        public static final Supplier<AttachmentType<RespawnData>> RESPAWN_DATA = ATTACHMENT_TYPES.register(
+                        "respawn_data",
+                        () -> AttachmentType
+                                        .serializable(() -> new RespawnData(Level.OVERWORLD, new BlockPos(0, 0, 0), 0))
+                                        .copyOnDeath()
+                                        .build());
 }

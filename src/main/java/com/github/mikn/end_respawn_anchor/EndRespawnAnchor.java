@@ -21,13 +21,10 @@
 
 package com.github.mikn.end_respawn_anchor;
 
-import com.github.mikn.end_respawn_anchor.capabilities.PlayerDataCapability;
-import com.github.mikn.end_respawn_anchor.capabilities.PlayerDataCapabilityAttacher;
 import com.github.mikn.end_respawn_anchor.config.EndRespawnAnchorConfig;
 import com.github.mikn.end_respawn_anchor.init.BlockInit;
+import com.github.mikn.end_respawn_anchor.init.DataAttachmentInit;
 import com.github.mikn.end_respawn_anchor.init.ItemInit;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -51,6 +48,7 @@ public class EndRespawnAnchor {
                 "end_respawn_anchor-common.toml");
         BlockInit.BLOCKS.register(modEventBus);
         ItemInit.ITEMS.register(modEventBus);
+        DataAttachmentInit.ATTACHMENT_TYPES.register(modEventBus);
     }
 
     @SubscribeEvent
@@ -58,20 +56,5 @@ public class EndRespawnAnchor {
         if (evt.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS) {
             evt.accept(ItemInit.END_RESPAWN_ANCHOR);
         }
-    }
-
-    @SubscribeEvent
-    public void attachCapabilitiesEntity(AttachCapabilitiesEvent<Entity> event) {
-        if (event.getObject() instanceof Player) {
-            PlayerDataCapabilityAttacher.attach(event);
-        }
-    }
-
-    @SubscribeEvent
-    public void onPlayerClone(final PlayerEvent.Clone event) {
-        event.getOriginal().reviveCaps();
-        event.getOriginal().getCapability(PlayerDataCapability.INSTANCE).ifPresent(cap -> event.getEntity()
-                .getCapability(PlayerDataCapability.INSTANCE).ifPresent(c -> c.deserializeNBT(cap.serializeNBT())));
-        event.getOriginal().invalidateCaps();
     }
 }

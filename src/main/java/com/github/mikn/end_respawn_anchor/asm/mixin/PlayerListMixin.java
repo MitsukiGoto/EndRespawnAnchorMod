@@ -21,9 +21,10 @@
 
 package com.github.mikn.end_respawn_anchor.asm.mixin;
 
-import com.github.mikn.end_respawn_anchor.capabilities.PlayerDataCapability;
 import com.github.mikn.end_respawn_anchor.config.EndRespawnAnchorConfig;
 import com.github.mikn.end_respawn_anchor.init.BlockInit;
+import com.github.mikn.end_respawn_anchor.init.DataAttachmentInit;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
@@ -42,36 +43,39 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Debug(export=true)
+@Debug(export = true)
 @Mixin(PlayerList.class)
 public class PlayerListMixin {
 
-    @Redirect(method= "respawn(Lnet/minecraft/server/level/ServerPlayer;Z)Lnet/minecraft/server/level/ServerPlayer;", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;getRespawnPosition()Lnet/minecraft/core/BlockPos;"))
+    @Redirect(method = "respawn(Lnet/minecraft/server/level/ServerPlayer;Z)Lnet/minecraft/server/level/ServerPlayer;", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;getRespawnPosition()Lnet/minecraft/core/BlockPos;"))
     private BlockPos redirect_position(ServerPlayer player) {
-        player.reviveCaps();
-        var cap = player.getCapability(PlayerDataCapability.INSTANCE, null);
-        return shouldReplaceSpawnInfo(player) && cap.isPresent() ? cap.resolve().get().getRespawnData().blockPos(): player.getRespawnPosition();
-    }
-    
-    @Redirect(method= "respawn(Lnet/minecraft/server/level/ServerPlayer;Z)Lnet/minecraft/server/level/ServerPlayer;", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;getRespawnAngle()F"))
-    private float redirect_f(ServerPlayer player) {
-        player.reviveCaps();
-        var cap = player.getCapability(PlayerDataCapability.INSTANCE, null);
-        return shouldReplaceSpawnInfo(player) && cap.isPresent() ? cap.resolve().get().getRespawnData().respawnAngle(): player.getRespawnAngle();
+        return shouldReplaceSpawnInfo(player) && player.hasData(DataAttachmentInit.RESPAWN_DATA)
+                ? player.getData(DataAttachmentInit.RESPAWN_DATA).getBlockPos()
+                : player.getRespawnPosition();
     }
 
-    @Redirect(method = "respawn(Lnet/minecraft/server/level/ServerPlayer;Z)Lnet/minecraft/server/level/ServerPlayer;", at = @At(value = "INVOKE", target ="Lnet/minecraft/server/MinecraftServer;getLevel(Lnet/minecraft/resources/ResourceKey;)Lnet/minecraft/server/level/ServerLevel;"))
-    private ServerLevel redirect_serverlevel(MinecraftServer server, ResourceKey<Level> pDimension, ServerPlayer player, boolean pKeepEverything) {
-        player.reviveCaps();
-        var cap = player.getCapability(PlayerDataCapability.INSTANCE, null);
-        ResourceKey<Level> level = cap.isPresent()? cap.resolve().get().getRespawnData().dimension() : Level.OVERWORLD;
+    @Redirect(method = "respawn(Lnet/minecraft/server/level/ServerPlayer;Z)Lnet/minecraft/server/level/ServerPlayer;", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;getRespawnAngle()F"))
+    private float redirect_f(ServerPlayer player) {
+        return shouldReplaceSpawnInfo(player) && player.hasData(DataAttachmentInit.RESPAWN_DATA)
+                ? player.getData(DataAttachmentInit.RESPAWN_DATA).getRespawnAngle()
+                : player.getRespawnAngle();
+    }
+
+    @Redirect(method = "respawn(Lnet/minecraft/server/level/ServerPlayer;Z)Lnet/minecraft/server/level/ServerPlayer;", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;getLevel(Lnet/minecraft/resources/ResourceKey;)Lnet/minecraft/server/level/ServerLevel;"))
+    private ServerLevel redirect_serverlevel(MinecraftServer server, ResourceKey<Level> pDimension, ServerPlayer player,
+            boolean pKeepEverything) {
+        ResourceKey<Level> level = player.hasData(DataAttachmentInit.RESPAWN_DATA)
+                ? player.getData(DataAttachmentInit.RESPAWN_DATA).getDimension()
+                : Level.OVERWORLD;
         return server.getLevel(shouldReplaceSpawnInfo(player) ? level : pDimension);
     }
 
     @Redirect(method = "respawn(Lnet/minecraft/server/level/ServerPlayer;Z)Lnet/minecraft/server/level/ServerPlayer;", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;setRespawnPosition(Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/core/BlockPos;FZZ)V"))
-    private void redirect_setRespawnPosition(ServerPlayer newPlayer, ResourceKey<Level> dimension, BlockPos blockPos, float f, boolean flag, boolean sendMessage, ServerPlayer oldPlayer, boolean pKeepEverything) {
-        if(shouldReplaceSpawnInfo(oldPlayer)) {
-            newPlayer.setRespawnPosition(oldPlayer.getRespawnDimension(), oldPlayer.getRespawnPosition(), oldPlayer.getRespawnAngle(), oldPlayer.isRespawnForced(), false);
+    private void redirect_setRespawnPosition(ServerPlayer newPlayer, ResourceKey<Level> dimension, BlockPos blockPos,
+            float f, boolean flag, boolean sendMessage, ServerPlayer oldPlayer, boolean pKeepEverything) {
+        if (shouldReplaceSpawnInfo(oldPlayer)) {
+            newPlayer.setRespawnPosition(oldPlayer.getRespawnDimension(), oldPlayer.getRespawnPosition(),
+                    oldPlayer.getRespawnAngle(), oldPlayer.isRespawnForced(), false);
         } else {
             newPlayer.setRespawnPosition(dimension, blockPos, f, flag, false);
         }
@@ -84,7 +88,9 @@ public class PlayerListMixin {
 
     @Unique
     private boolean shouldReplaceSpawnInfo(ServerPlayer player) {
-        // Both Respawn Dimension and position should be changed when players have set their spawn point in the End.
-        return EndRespawnAnchorConfig.shouldChangeSpawnInfo.get() && player.isChangingDimension() && player.level().dimension() == Level.END && player.getRespawnDimension() == Level.END;
+        // Both Respawn Dimension and position should be changed when players set
+        // their spawn point in the End.
+        return EndRespawnAnchorConfig.shouldChangeSpawnInfo.get() && player.isChangingDimension()
+                && player.level().dimension() == Level.END && player.getRespawnDimension() == Level.END;
     }
 }
