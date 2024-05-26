@@ -80,10 +80,10 @@ public class PlayerListMixin {
     private void modifyArgs_setRespawnPosition(Args args, ServerPlayer oldPlayer,
             boolean pKeepEverything) {
         if (shouldOverrideSpawnData(oldPlayer)) {
-            args.set(1, oldPlayer.getRespawnDimension());
-            args.set(2, oldPlayer.getRespawnPosition());
-            args.set(3, oldPlayer.getRespawnAngle());
-            args.set(4, oldPlayer.isRespawnForced());
+            args.set(0, oldPlayer.getRespawnDimension());
+            args.set(1, oldPlayer.getRespawnPosition());
+            args.set(2, oldPlayer.getRespawnAngle());
+            args.set(3, oldPlayer.isRespawnForced());
         }
     }
 
