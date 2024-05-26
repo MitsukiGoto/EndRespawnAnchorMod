@@ -43,7 +43,9 @@ import org.spongepowered.asm.mixin.Mixin;
 import net.minecraft.server.players.PlayerList;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.ModifyArgs;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 @Debug(export = true)
 @Mixin(PlayerList.class)
@@ -74,14 +76,14 @@ public class PlayerListMixin {
                         : pDimension);
     }
 
-    @Redirect(method = "respawn(Lnet/minecraft/server/level/ServerPlayer;Z)Lnet/minecraft/server/level/ServerPlayer;", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;setRespawnPosition(Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/core/BlockPos;FZZ)V"))
-    private void redirect_setRespawnPosition(ServerPlayer newPlayer, ResourceKey<Level> dimension, BlockPos blockPos,
-            float f, boolean flag, boolean sendMessage, ServerPlayer oldPlayer, boolean pKeepEverything) {
+    @ModifyArgs(method = "respawn(Lnet/minecraft/server/level/ServerPlayer;Z)Lnet/minecraft/server/level/ServerPlayer;", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;setRespawnPosition(Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/core/BlockPos;FZZ)V"))
+    private void modifyArgs_setRespawnPosition(Args args, ServerPlayer oldPlayer,
+            boolean pKeepEverything) {
         if (shouldOverrideSpawnData(oldPlayer)) {
-            newPlayer.setRespawnPosition(oldPlayer.getRespawnDimension(), oldPlayer.getRespawnPosition(),
-                    oldPlayer.getRespawnAngle(), oldPlayer.isRespawnForced(), false);
-        } else {
-            newPlayer.setRespawnPosition(dimension, blockPos, f, flag, false);
+            args.set(1, oldPlayer.getRespawnDimension());
+            args.set(2, oldPlayer.getRespawnPosition());
+            args.set(3, oldPlayer.getRespawnAngle());
+            args.set(4, oldPlayer.isRespawnForced());
         }
     }
 
