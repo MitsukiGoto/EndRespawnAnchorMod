@@ -40,15 +40,15 @@ import java.util.Optional;
 @Mixin(Player.class)
 public class PlayerMixin {
     @Inject(method = "findRespawnPositionAndUseSpawnBlock(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;FZZ)Ljava/util/Optional;", at = @At("HEAD"), cancellable = true)
-    private static void inject(ServerLevel p_36131_, BlockPos p_36132_, float p_36133_, boolean p_36134_,
-            boolean p_36135_, CallbackInfoReturnable<Optional<Vec3>> cir) {
-        BlockState blockstate = p_36131_.getBlockState(p_36132_);
+    private static void inject(ServerLevel level, BlockPos blockPos, float p_36133_, boolean p_36134_,
+            boolean respawnAfterWinningTheGame, CallbackInfoReturnable<Optional<Vec3>> cir) {
+        BlockState blockstate = level.getBlockState(blockPos);
         Block block = blockstate.getBlock();
         if (block instanceof EndRespawnAnchorBlock && blockstate.getValue(EndRespawnAnchorBlock.CHARGE) > 0
-                && EndRespawnAnchorBlock.isEnd(p_36131_) && !p_36131_.isClientSide) {
-            Optional<Vec3> optional = EndRespawnAnchorBlock.findStandUpPosition(EntityType.PLAYER, p_36131_, p_36132_);
-            if (!p_36135_ && optional.isPresent()) {
-                p_36131_.setBlock(p_36132_, blockstate.setValue(EndRespawnAnchorBlock.CHARGE,
+                && EndRespawnAnchorBlock.isEnd(level) && !level.isClientSide) {
+            Optional<Vec3> optional = EndRespawnAnchorBlock.findStandUpPosition(EntityType.PLAYER, level, blockPos);
+            if (!respawnAfterWinningTheGame && optional.isPresent()) {
+                level.setBlock(blockPos, blockstate.setValue(EndRespawnAnchorBlock.CHARGE,
                         Integer.valueOf(blockstate.getValue(EndRespawnAnchorBlock.CHARGE) - 1)), 3);
             }
             cir.setReturnValue(optional);

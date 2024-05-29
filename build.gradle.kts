@@ -71,6 +71,19 @@ tasks.jar {
 	}
 }
 
+tasks.jar {
+    manifest {
+        attributes(
+                "Specification-Title"     to "EndRespawnAnchor",
+                "Specification-Vendor"    to "Mikndesu",
+                "Specification-Version"   to mod_version,
+                "Implementation-Title"    to archives_base_name,
+                "Implementation-Version"  to mod_version,
+                "Implementation-Vendor"   to "Mikndesu",
+        )
+    }
+}
+
 loom {
 	mixin.defaultRefmapName.set("end_respawn_anchor.refmap.json")
 	accessWidenerPath.set(File("src/main/resources/end_respawn_anchor.accesswidener"))
