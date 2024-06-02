@@ -53,27 +53,34 @@ public class PlayerListMixin {
 
     @Redirect(method = "respawn(Lnet/minecraft/server/level/ServerPlayer;Z)Lnet/minecraft/server/level/ServerPlayer;", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;getRespawnPosition()Lnet/minecraft/core/BlockPos;"))
     private BlockPos redirect_position(ServerPlayer player) {
+        if (!shouldOverrideSpawnData(player)) {
+            return player.getRespawnPosition();
+        }
         var p = (IServerPlayerMixin) (Object) player;
         Optional<BlockPos> optional = Optional.of(p.end_respawn_anchor$getPreBlockPos());
-        return shouldOverrideSpawnData(player) && optional.isPresent() ? optional.get() : player.getRespawnPosition();
+        return optional.orElse(player.getRespawnPosition());
     }
 
     @Redirect(method = "respawn(Lnet/minecraft/server/level/ServerPlayer;Z)Lnet/minecraft/server/level/ServerPlayer;", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;getRespawnAngle()F"))
     private float redirect_f(ServerPlayer player) {
+        if (!shouldOverrideSpawnData(player)) {
+            return player.getRespawnAngle();
+        }
         var p = (IServerPlayerMixin) (Object) player;
-        Optional<BlockPos> optional = Optional.of(p.end_respawn_anchor$getPreBlockPos());
-        return shouldOverrideSpawnData(player) && optional.isPresent() ? p.end_respawn_anchor$getPreRespawnAngle()
-                : player.getRespawnAngle();
+        Optional<Float> optional = Optional.of(p.end_respawn_anchor$getPreRespawnAngle());
+        return optional.orElse(player.getRespawnAngle());
     }
 
     @Redirect(method = "respawn(Lnet/minecraft/server/level/ServerPlayer;Z)Lnet/minecraft/server/level/ServerPlayer;", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;getLevel(Lnet/minecraft/resources/ResourceKey;)Lnet/minecraft/server/level/ServerLevel;"))
     private ServerLevel redirect_serverlevel(MinecraftServer server, ResourceKey<Level> pDimension, ServerPlayer player,
             boolean pKeepEverything) {
+        if (!shouldOverrideSpawnData(player)) {
+            return server.getLevel(pDimension);
+        }
         var p = (IServerPlayerMixin) (Object) player;
         Optional<BlockPos> optional = Optional.of(p.end_respawn_anchor$getPreBlockPos());
-        return server.getLevel(
-                shouldOverrideSpawnData(player) && optional.isPresent() ? p.end_respawn_anchor$getPreRespawnDimension()
-                        : pDimension);
+        // if saved block pos is valid, use saved respawn dimension.
+        return server.getLevel(optional.isPresent() ? p.end_respawn_anchor$getPreRespawnDimension() : pDimension);
     }
 
     @ModifyArgs(method = "respawn(Lnet/minecraft/server/level/ServerPlayer;Z)Lnet/minecraft/server/level/ServerPlayer;", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;setRespawnPosition(Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/core/BlockPos;FZZ)V"))
