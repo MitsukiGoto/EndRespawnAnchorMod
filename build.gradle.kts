@@ -36,6 +36,10 @@ repositories {
 	}
 }
 
+base {
+	archivesName = "${archives_base_name}-${mod_version}"
+}
+
 dependencies {
 	minecraft("com.mojang:minecraft:${minecraft_version}")
 	mappings(loom.layered {
@@ -67,21 +71,8 @@ java {
 
 tasks.jar {
 	from("LICENSE") {
-		rename { "${it}_${archives_base_name}"}
+		rename { "${it}_${project.base.archivesName.get()}"}
 	}
-}
-
-tasks.jar {
-    manifest {
-        attributes(
-                "Specification-Title"     to "EndRespawnAnchor",
-                "Specification-Vendor"    to "Mikndesu",
-                "Specification-Version"   to mod_version,
-                "Implementation-Title"    to archives_base_name,
-                "Implementation-Version"  to mod_version,
-                "Implementation-Vendor"   to "Mikndesu",
-        )
-    }
 }
 
 loom {
@@ -96,11 +87,14 @@ curseforge {
 		releaseType = "release"
 		addGameVersion("1.20")
 		addGameVersion("1.20.1")
+		addGameVersion("1.20.2")
+		addGameVersion("1.20.3")
+		addGameVersion("1.20.4")
         addGameVersion("1.20-Snapshot")
         addGameVersion("Java 17")
         addGameVersion("Fabric")
 		mainArtifact(tasks.findByName("remapJar"), closureOf<CurseArtifact>{
-			displayName = "${archives_base_name}_${mod_version}"
+			displayName = "${project.base.archivesName.get()}"
 		})
 	})
     options(closureOf<Options> {
