@@ -3,20 +3,20 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.neoforged.gradle.userdev' version '7.0.97'
+    id 'net.neoforged.gradle.userdev' version '7.0.142'
     id 'com.matthewprenger.cursegradle' version '1.4.0'
     id 'com.modrinth.minotaur' version "2.+"
 }
 
 version = project.mod_version
 group = 'com.mikn.end_respawn_anchor'
-archivesBaseName = 'neo-forge-end_respawn_anchor'
+archivesBaseName = "${mod_name}-${mod_version}"
 
 repositories {
     mavenLocal()
 }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 runs {
     configureEach {
         systemProperty 'forge.logging.markers', 'REGISTRIES'
@@ -87,8 +87,9 @@ curseforge {
         project {
             id = project.curseforge_project_id
             releaseType = "release"
-            addGameVersion "1.20.4"
-            addGameVersion "Java 17"
+            addGameVersion "1.20.5"
+            addGameVersion "1.20.6"
+            addGameVersion "Java 21"
             addGameVersion "NeoForge"
             mainArtifact(jar.archivePath) {
                 displayName = "${project.archivesBaseName}_${project.version}"
@@ -111,7 +112,7 @@ modrinth {
     	versionNumber = project.version
     	versionName = project.archivesBaseName
     	uploadFile = jar
-    	gameVersions = ['1.20','1.20.4']
+    	gameVersions = ['1.20.5','1.20.6']
     	dependencies {
     	}
     }
