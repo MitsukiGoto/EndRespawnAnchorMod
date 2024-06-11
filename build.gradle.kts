@@ -9,8 +9,8 @@ plugins {
 	id("maven-publish")
 }
 
-java.sourceCompatibility = JavaVersion.VERSION_17
-java.targetCompatibility = JavaVersion.VERSION_17
+java.sourceCompatibility = JavaVersion.VERSION_21
+java.targetCompatibility = JavaVersion.VERSION_21
 
 val minecraft_version: String by extra
 val parchment_version:String by extra
@@ -62,7 +62,7 @@ tasks.processResources {
 }
 
 tasks.withType<JavaCompile> {
-	options.release.set(17)
+	options.release.set(21)
 }
 
 java {
@@ -85,13 +85,9 @@ curseforge {
 	project(closureOf<CurseProject> {
 		id = curseforge_project_id
 		releaseType = "release"
-		addGameVersion("1.20")
-		addGameVersion("1.20.1")
-		addGameVersion("1.20.2")
-		addGameVersion("1.20.3")
-		addGameVersion("1.20.4")
-        addGameVersion("1.20-Snapshot")
-        addGameVersion("Java 17")
+		addGameVersion("1.20.5")
+		addGameVersion("1.20.6")
+        addGameVersion("Java 21")
         addGameVersion("Fabric")
 		mainArtifact(tasks.findByName("remapJar"), closureOf<CurseArtifact>{
 			displayName = "${project.base.archivesName.get()}"
@@ -113,7 +109,7 @@ modrinth {
     versionNumber.set(mod_version)
     versionName.set(archives_base_name)
     uploadFile.set(tasks.remapJar.get())
-    gameVersions.addAll("1.20", "1.20.1", "1.20.2","1.20.3","1.20.4")
+    gameVersions.addAll("1.20.5","1.20.6")
     loaders.add("fabric")
     dependencies {
         required.project("fabric-api")
