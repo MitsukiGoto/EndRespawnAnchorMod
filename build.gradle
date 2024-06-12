@@ -89,10 +89,9 @@ curseforge {
             releaseType = "release"
             addGameVersion "1.20.5"
             addGameVersion "1.20.6"
-            addGameVersion "Java 21"
             addGameVersion "NeoForge"
             mainArtifact(jar.archivePath) {
-                displayName = "${project.archivesBaseName}"
+                displayName = "${project.archivesBaseName} ${project.version}"
             }
             afterEvaluate {
                 uploadTask.dependsOn("build")
@@ -101,7 +100,7 @@ curseforge {
     }
     options {
         forgeGradleIntegration = false
-        javaVersionAutoDetect = false
+        javaVersionAutoDetect = true
     }
 }
 
