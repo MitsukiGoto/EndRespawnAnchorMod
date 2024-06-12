@@ -1,4 +1,5 @@
 import com.matthewprenger.cursegradle.CurseArtifact
+import com.matthewprenger.cursegradle.CurseRelation
 import com.matthewprenger.cursegradle.CurseProject
 import com.matthewprenger.cursegradle.Options
 
@@ -87,15 +88,19 @@ curseforge {
 		releaseType = "release"
 		addGameVersion("1.20.5")
 		addGameVersion("1.20.6")
-        addGameVersion("Java 21")
         addGameVersion("Fabric")
 		mainArtifact(tasks.findByName("remapJar"), closureOf<CurseArtifact>{
 			displayName = "${project.base.archivesName.get()}"
+			relations(closureOf<CurseRelation> {
+				requiredDependency("fabric-api")
+				requiredDependency("cloth-config")
+				optionalDependency("modmenu")
+			})
 		})
 	})
     options(closureOf<Options> {
         forgeGradleIntegration = false
-        javaVersionAutoDetect = false
+        javaVersionAutoDetect = true
     })
 }
 
@@ -107,7 +112,7 @@ modrinth {
     token.set(System.getenv("modrinth_token"))
 	projectId.set(modrinth_project_id)
     versionNumber.set(mod_version)
-    versionName.set(archives_base_name)
+    versionName.set("${archives_base_name} ${mod_version}")
     uploadFile.set(tasks.remapJar.get())
     gameVersions.addAll("1.20.5","1.20.6")
     loaders.add("fabric")
@@ -117,6 +122,7 @@ modrinth {
         optional.project("modmenu")
     }
 }
+
 tasks.modrinth {
 	dependsOn("build")
 }
