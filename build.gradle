@@ -10,7 +10,7 @@ plugins {
 
 version = project.mod_version
 group = 'com.mikn.end_respawn_anchor'
-archivesBaseName = "${mod_name}-${mod_version}"
+archivesBaseName = project.mod_name
 
 repositories {
     mavenLocal()
@@ -92,7 +92,7 @@ curseforge {
             addGameVersion "Java 21"
             addGameVersion "NeoForge"
             mainArtifact(jar.archivePath) {
-                displayName = "${project.archivesBaseName}_${project.version}"
+                displayName = "${project.archivesBaseName}"
             }
             afterEvaluate {
                 uploadTask.dependsOn("build")
