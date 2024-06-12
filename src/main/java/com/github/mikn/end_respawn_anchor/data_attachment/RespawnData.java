@@ -24,6 +24,7 @@ package com.github.mikn.end_respawn_anchor.data_attachment;
 import com.github.mikn.end_respawn_anchor.EndRespawnAnchor;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.resources.ResourceKey;
@@ -61,7 +62,7 @@ public class RespawnData implements INBTSerializable<CompoundTag> {
     }
 
     @Override
-    public CompoundTag serializeNBT() {
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
         CompoundTag tag = new CompoundTag();
         tag.putString(NBT_KEY_PLAYER_SPAWN_DIMENSION, this.dimension.location().toString());
         tag.putInt(NBT_KEY_PLAYER_SPAWN_POS_X, this.blockPos.getX());
@@ -72,7 +73,7 @@ public class RespawnData implements INBTSerializable<CompoundTag> {
     }
 
     @Override
-    public void deserializeNBT(CompoundTag tag) {
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
         ResourceKey<Level> dimension = Level.RESOURCE_KEY_CODEC
                 .parse(NbtOps.INSTANCE, tag.get(NBT_KEY_PLAYER_SPAWN_DIMENSION))
                 .resultOrPartial(EndRespawnAnchor.LOGGER::error).orElse(Level.OVERWORLD);
