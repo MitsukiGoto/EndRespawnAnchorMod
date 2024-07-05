@@ -53,22 +53,24 @@ public class PlayerListMixin {
 
     @Redirect(method = "respawn(Lnet/minecraft/server/level/ServerPlayer;Z)Lnet/minecraft/server/level/ServerPlayer;", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;getRespawnPosition()Lnet/minecraft/core/BlockPos;"))
     private BlockPos redirect_position(ServerPlayer player) {
+        var originalRespawnPosition = player.getRespawnPosition();
         if (!shouldOverrideSpawnData(player)) {
-            return player.getRespawnPosition();
+            return originalRespawnPosition;
         }
         var p = (IServerPlayerMixin) (Object) player;
-        Optional<BlockPos> optional = Optional.of(p.end_respawn_anchor$getPreBlockPos());
-        return optional.orElse(player.getRespawnPosition());
+        Optional<BlockPos> optional = Optional.ofNullable(p.end_respawn_anchor$getPreBlockPos());
+        return optional.orElse(originalRespawnPosition);
     }
 
     @Redirect(method = "respawn(Lnet/minecraft/server/level/ServerPlayer;Z)Lnet/minecraft/server/level/ServerPlayer;", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;getRespawnAngle()F"))
     private float redirect_f(ServerPlayer player) {
+        var originalRespawnAngle = player.getRespawnAngle();
         if (!shouldOverrideSpawnData(player)) {
-            return player.getRespawnAngle();
+            return originalRespawnAngle;
         }
         var p = (IServerPlayerMixin) (Object) player;
-        Optional<Float> optional = Optional.of(p.end_respawn_anchor$getPreRespawnAngle());
-        return optional.orElse(player.getRespawnAngle());
+        Optional<Float> optional = Optional.ofNullable(p.end_respawn_anchor$getPreRespawnAngle());
+        return optional.orElse(originalRespawnAngle);
     }
 
     @Redirect(method = "respawn(Lnet/minecraft/server/level/ServerPlayer;Z)Lnet/minecraft/server/level/ServerPlayer;", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;getLevel(Lnet/minecraft/resources/ResourceKey;)Lnet/minecraft/server/level/ServerLevel;"))
@@ -78,7 +80,7 @@ public class PlayerListMixin {
             return server.getLevel(pDimension);
         }
         var p = (IServerPlayerMixin) (Object) player;
-        Optional<BlockPos> optional = Optional.of(p.end_respawn_anchor$getPreBlockPos());
+        Optional<BlockPos> optional = Optional.ofNullable(p.end_respawn_anchor$getPreBlockPos());
         // if saved block pos is valid, use saved respawn dimension.
         return server.getLevel(optional.isPresent() ? p.end_respawn_anchor$getPreRespawnDimension() : pDimension);
     }
