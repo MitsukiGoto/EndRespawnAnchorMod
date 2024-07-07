@@ -2,3 +2,5 @@ accessWidener v2 named
 
 accessible field net/minecraft/server/players/PlayerList playerIo Lnet/minecraft/world/level/storage/PlayerDataStorage;
 accessible field net/minecraft/world/level/storage/PlayerDataStorage playerDir Ljava/io/File;
+accessible method net/minecraft/world/level/block/RespawnAnchorBlock canBeCharged (Lnet/minecraft/world/level/block/state/BlockState;)Z
+accessible method net/minecraft/world/level/block/RespawnAnchorBlock explode (Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;)V

@@ -45,7 +45,7 @@ public class PlayerMixin {
         BlockState blockstate = level.getBlockState(blockPos);
         Block block = blockstate.getBlock();
         if (block instanceof EndRespawnAnchorBlock && blockstate.getValue(EndRespawnAnchorBlock.CHARGE) > 0
-                && EndRespawnAnchorBlock.isEnd(level) && !level.isClientSide) {
+                && EndRespawnAnchorBlock.canSetSpawn(level) && !level.isClientSide) {
             Optional<Vec3> optional = EndRespawnAnchorBlock.findStandUpPosition(EntityType.PLAYER, level, blockPos);
             if (!respawnAfterWinningTheGame && optional.isPresent()) {
                 level.setBlock(blockPos, blockstate.setValue(EndRespawnAnchorBlock.CHARGE,
