@@ -28,10 +28,13 @@ import com.github.mikn.end_respawn_anchor.init.ItemInit;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.ModLoadingContext;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
+
+import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -44,8 +47,13 @@ public class EndRespawnAnchor {
 
     public EndRespawnAnchor(@NonNull IEventBus modEventBus) {
         modEventBus.addListener(this::registerCreativeTabs);
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, EndRespawnAnchorConfig.SPEC,
-                "end_respawn_anchor-common.toml");
+        Optional<? extends ModContainer> optional = ModList.get().getModContainerById(MODID);
+        optional.ifPresentOrElse(container -> {
+            container.registerConfig(ModConfig.Type.COMMON, EndRespawnAnchorConfig.SPEC,
+                    "end_respawn_anchor-common.toml");
+        }, () -> {
+            LOGGER.error("Could not fetch ModContainer.");
+        });
         BlockInit.BLOCKS.register(modEventBus);
         ItemInit.ITEMS.register(modEventBus);
         DataAttachmentInit.ATTACHMENT_TYPES.register(modEventBus);
