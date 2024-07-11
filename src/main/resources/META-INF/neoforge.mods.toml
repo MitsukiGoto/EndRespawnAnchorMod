@@ -26,4 +26,4 @@ side = "BOTH"
 [[mixins]]
 config = "end_respawn_anchor.mixins.json"
 [[accessTransformers]]
-file = "accesstransformer.cfg"
+file = "META-INF/accesstransformer.cfg"
