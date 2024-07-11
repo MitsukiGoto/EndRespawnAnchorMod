@@ -25,3 +25,5 @@ ordering = "NONE"
 side = "BOTH"
 [[mixins]]
 config = "end_respawn_anchor.mixins.json"
+[[accessTransformers]]
+file = "accesstransformer.cfg"
