@@ -3,12 +3,7 @@
   "package": "com.github.mikn.end_respawn_anchor.asm.mixin",
   "compatibilityLevel": "JAVA_17",
   "refmap": "end_respawn_anchor.refmap.json",
-  "mixins": [
-    "PlayerListMixin",
-    "PlayerMixin",
-    "ServerPlayerMixin"
-  ],
-  "client": [
-  ],
+  "mixins": ["PlayerListMixin", "ServerPlayerMixin"],
+  "client": [],
   "minVersion": "0.8"
 }
