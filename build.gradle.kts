@@ -4,7 +4,7 @@ import com.matthewprenger.cursegradle.CurseProject
 import com.matthewprenger.cursegradle.Options
 
 plugins {
-	id("fabric-loom") version "1.6-SNAPSHOT"
+	id("fabric-loom") version "1.7-SNAPSHOT"
 	id("com.matthewprenger.cursegradle") version "1.4.0"
 	id("com.modrinth.minotaur") version "2.+"
 	id("maven-publish")
@@ -86,8 +86,7 @@ curseforge {
 	project(closureOf<CurseProject> {
 		id = curseforge_project_id
 		releaseType = "release"
-		addGameVersion("1.20.5")
-		addGameVersion("1.20.6")
+		addGameVersion("1.21")
         addGameVersion("Fabric")
 		mainArtifact(tasks.findByName("remapJar"), closureOf<CurseArtifact>{
 			displayName = "${project.base.archivesName.get()}"
@@ -114,7 +113,7 @@ modrinth {
     versionNumber.set(mod_version)
     versionName.set("${archives_base_name} ${mod_version}")
     uploadFile.set(tasks.remapJar.get())
-    gameVersions.addAll("1.20.5","1.20.6")
+    gameVersions.addAll("1.21")
     loaders.add("fabric")
     dependencies {
         required.project("fabric-api")
