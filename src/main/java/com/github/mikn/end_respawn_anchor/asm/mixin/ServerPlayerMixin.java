@@ -23,17 +23,26 @@ package com.github.mikn.end_respawn_anchor.asm.mixin;
 
 import com.github.mikn.end_respawn_anchor.EndRespawnAnchor;
 import com.github.mikn.end_respawn_anchor.IServerPlayerMixin;
+import com.github.mikn.end_respawn_anchor.block.EndRespawnAnchorBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import java.util.Optional;
 
 @Mixin(ServerPlayer.class)
 public class ServerPlayerMixin implements IServerPlayerMixin {
@@ -127,6 +136,22 @@ public class ServerPlayerMixin implements IServerPlayerMixin {
             newPlayer.end_respawn_anchor$setPreBlockPos(oldPlayer.end_respawn_anchor$getPreBlockPos());
             newPlayer.end_respawn_anchor$setPreRespawnDimension(oldPlayer.end_respawn_anchor$getPreRespawnDimension());
             newPlayer.end_respawn_anchor$setPreRespawnAngle(oldPlayer.end_respawn_anchor$getPreRespawnAngle());
+        }
+    }
+
+    @Inject(method = "findRespawnAndUseSpawnBlock(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;FZZ)Ljava/util/Optional;", at = @At("HEAD"), cancellable = true)
+    private static void inject(ServerLevel level, BlockPos blockPos, float angle, boolean forced,
+                               boolean keepInventory, CallbackInfoReturnable<Optional<ServerPlayer.RespawnPosAngle>> cir) {
+        BlockState blockstate = level.getBlockState(blockPos);
+        Block block = blockstate.getBlock();
+        if (block instanceof EndRespawnAnchorBlock && blockstate.getValue(EndRespawnAnchorBlock.CHARGE) > 0
+                && EndRespawnAnchorBlock.canSetSpawn(level) && !level.isClientSide) {
+            Optional<Vec3> optional = EndRespawnAnchorBlock.findStandUpPosition(EntityType.PLAYER, level, blockPos);
+            if (!keepInventory && optional.isPresent()) {
+                level.setBlock(blockPos, blockstate.setValue(EndRespawnAnchorBlock.CHARGE,
+                        Integer.valueOf(blockstate.getValue(EndRespawnAnchorBlock.CHARGE) - 1)), 3);
+            }
+            // cir.setReturnValue(optional);
         }
     }
 }

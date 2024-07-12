@@ -24,6 +24,7 @@ package com.github.mikn.end_respawn_anchor.asm.mixin;
 import com.github.mikn.end_respawn_anchor.block.EndRespawnAnchorBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer.RespawnPosAngle;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -39,20 +40,4 @@ import java.util.Optional;
 
 @Mixin(Player.class)
 public class PlayerMixin {
-    @Inject(method = "findRespawnPositionAndUseSpawnBlock(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;FZZ)Ljava/util/Optional;", at = @At("HEAD"), cancellable = true)
-    private static void inject(ServerLevel level, BlockPos blockPos, float p_36133_, boolean p_36134_,
-            boolean respawnAfterWinningTheGame, CallbackInfoReturnable<Optional<Vec3>> cir) {
-        BlockState blockstate = level.getBlockState(blockPos);
-        Block block = blockstate.getBlock();
-        if (block instanceof EndRespawnAnchorBlock && blockstate.getValue(EndRespawnAnchorBlock.CHARGE) > 0
-                && EndRespawnAnchorBlock.canSetSpawn(level) && !level.isClientSide) {
-            Optional<Vec3> optional = EndRespawnAnchorBlock.findStandUpPosition(EntityType.PLAYER, level, blockPos);
-            if (!respawnAfterWinningTheGame && optional.isPresent()) {
-                level.setBlock(blockPos, blockstate.setValue(EndRespawnAnchorBlock.CHARGE,
-                        Integer.valueOf(blockstate.getValue(EndRespawnAnchorBlock.CHARGE) - 1)), 3);
-            }
-            cir.setReturnValue(optional);
-        }
-
-    }
 }

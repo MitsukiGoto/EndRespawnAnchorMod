@@ -1,5 +1,6 @@
 accessWidener v2 named
 
+accessible class net/minecraft/server/level/ServerPlayer$RespawnPosAngle
 accessible field net/minecraft/server/players/PlayerList playerIo Lnet/minecraft/world/level/storage/PlayerDataStorage;
 accessible field net/minecraft/world/level/storage/PlayerDataStorage playerDir Ljava/io/File;
 accessible method net/minecraft/world/level/block/RespawnAnchorBlock canBeCharged (Lnet/minecraft/world/level/block/state/BlockState;)Z
