@@ -21,9 +21,11 @@
 
 package com.github.mikn.end_respawn_anchor.block;
 
+import com.github.mikn.end_respawn_anchor.EndRespawnAnchor;
 import com.github.mikn.end_respawn_anchor.IServerPlayerMixin;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
