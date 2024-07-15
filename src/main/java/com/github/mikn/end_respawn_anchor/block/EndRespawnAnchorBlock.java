@@ -21,6 +21,7 @@
 
 package com.github.mikn.end_respawn_anchor.block;
 
+import com.github.mikn.end_respawn_anchor.config.EndRespawnAnchorConfig;
 import com.github.mikn.end_respawn_anchor.data_attachment.RespawnData;
 import com.github.mikn.end_respawn_anchor.init.DataAttachmentInit;
 
@@ -48,13 +49,13 @@ public class EndRespawnAnchorBlock extends RespawnAnchorBlock {
     @Override
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos,
             Player player, InteractionHand hand, BlockHitResult hitResult) {
-        if (isRespawnFuel(stack) && super.canBeCharged(state)) {
+        if (isRespawnFuel(stack) && canBeCharged(state)) {
             charge(player, level, pos, state);
             stack.consume(1, player);
             return ItemInteractionResult.sidedSuccess(level.isClientSide);
         } else {
             return hand == InteractionHand.MAIN_HAND && isRespawnFuel(player.getItemInHand(InteractionHand.OFF_HAND))
-                    && super.canBeCharged(state) ? ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION
+                    && canBeCharged(state) ? ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION
                             : ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
     }
@@ -69,7 +70,7 @@ public class EndRespawnAnchorBlock extends RespawnAnchorBlock {
             ServerPlayer serverPlayer;
             if (!(level.isClientSide
                     || (serverPlayer = (ServerPlayer) player).getRespawnDimension() == level.dimension()
-                            && pos.equals((Object) serverPlayer.getRespawnPosition()))) {
+                            && pos.equals(serverPlayer.getRespawnPosition()))) {
                 if (serverPlayer.getRespawnDimension() != Level.END) {
                     RespawnData data = new RespawnData(serverPlayer.getRespawnDimension(),
                             serverPlayer.getRespawnPosition(), serverPlayer.getRespawnAngle());
@@ -86,6 +87,13 @@ public class EndRespawnAnchorBlock extends RespawnAnchorBlock {
             super.explode(state, level, pos);
         }
         return InteractionResult.sidedSuccess(level.isClientSide);
+    }
+
+    @Override
+    public final void explode(BlockState state, Level level, BlockPos pos2) {
+        if (EndRespawnAnchorConfig.isExplode.get()) {
+            super.explode(state, level, pos2);
+        }
     }
 
     private static boolean isRespawnFuel(ItemStack stack) {
