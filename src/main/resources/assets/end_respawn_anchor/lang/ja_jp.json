@@ -1,6 +1,6 @@
 {
   "block.end_respawn_anchor.end_respawn_anchor": "エンドリスポーンアンカー",
   "text.autoconfig.end_respawn_anchor.title": "コンフィグ設定画面",
-  "text.autoconfig.end_respawn_anchor.option.isExplode": "他のディメンションで使用すると爆発するか",
-  "text.autoconfig.end_respawn_anchor.option.shouldOverrideSpawnData": "スポーン地点の操作。詳しくは、Mod説明欄を見てください"
+  "text.autoconfig.end_respawn_anchor.option.isExplode": "他のディメンションで使用すると爆発します",
+  "text.autoconfig.end_respawn_anchor.option.shouldOverrideSpawnData": "スポーン地点の差し替え。詳しくは、Mod説明欄をご覧ください"
 }
