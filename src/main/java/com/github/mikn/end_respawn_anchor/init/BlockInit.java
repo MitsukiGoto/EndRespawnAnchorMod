@@ -37,7 +37,6 @@ public class BlockInit {
                         () -> new EndRespawnAnchorBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK)
                                         .instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops()
                                         .strength(50.0F, 1200.0F)
-                                        .lightLevel((p_152639_) -> {
-                                                return RespawnAnchorBlock.getScaledChargeLevel(p_152639_, 15);
-                                        })));
+                                        .lightLevel((p_152639_) -> RespawnAnchorBlock.getScaledChargeLevel(p_152639_,
+                                                        15))));
 }

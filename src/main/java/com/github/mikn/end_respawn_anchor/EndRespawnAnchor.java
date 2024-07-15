@@ -48,12 +48,10 @@ public class EndRespawnAnchor {
     public EndRespawnAnchor(@NonNull IEventBus modEventBus) {
         modEventBus.addListener(this::registerCreativeTabs);
         Optional<? extends ModContainer> optional = ModList.get().getModContainerById(MODID);
-        optional.ifPresentOrElse(container -> {
-            container.registerConfig(ModConfig.Type.COMMON, EndRespawnAnchorConfig.SPEC,
-                    "end_respawn_anchor-common.toml");
-        }, () -> {
-            LOGGER.error("Could not fetch ModContainer.");
-        });
+        optional.ifPresentOrElse(
+                container -> container.registerConfig(ModConfig.Type.COMMON, EndRespawnAnchorConfig.SPEC,
+                        "end_respawn_anchor-common.toml"),
+                () -> LOGGER.error("Could not fetch ModContainer."));
         BlockInit.BLOCKS.register(modEventBus);
         ItemInit.ITEMS.register(modEventBus);
         DataAttachmentInit.ATTACHMENT_TYPES.register(modEventBus);
