@@ -24,8 +24,8 @@ package com.github.mikn.end_respawn_anchor.block;
 import com.github.mikn.end_respawn_anchor.EndRespawnAnchor;
 import com.github.mikn.end_respawn_anchor.IServerPlayerMixin;
 
+import com.github.mikn.end_respawn_anchor.RespawnData;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -49,13 +49,13 @@ public class EndRespawnAnchorBlock extends RespawnAnchorBlock {
     @Override
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos,
             Player player, InteractionHand hand, BlockHitResult hitResult) {
-        if (isRespawnFuel(stack) && super.canBeCharged(state)) {
+        if (isRespawnFuel(stack) && canBeCharged(state)) {
             charge(player, level, pos, state);
             stack.consume(1, player);
             return ItemInteractionResult.sidedSuccess(level.isClientSide);
         } else {
             return hand == InteractionHand.MAIN_HAND && isRespawnFuel(player.getItemInHand(InteractionHand.OFF_HAND))
-                    && super.canBeCharged(state) ? ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION
+                    && canBeCharged(state) ? ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION
                             : ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
     }
@@ -70,12 +70,12 @@ public class EndRespawnAnchorBlock extends RespawnAnchorBlock {
             ServerPlayer serverPlayer;
             if (!(level.isClientSide
                     || (serverPlayer = (ServerPlayer) player).getRespawnDimension() == level.dimension()
-                            && pos.equals((Object) serverPlayer.getRespawnPosition()))) {
+                            && pos.equals(serverPlayer.getRespawnPosition()))) {
                 if (serverPlayer.getRespawnDimension() != Level.END) {
-                    var p = (IServerPlayerMixin) (Object) serverPlayer;
-                    p.end_respawn_anchor$setPreBlockPos(serverPlayer.getRespawnPosition());
-                    p.end_respawn_anchor$setPreRespawnDimension(serverPlayer.getRespawnDimension());
-                    p.end_respawn_anchor$setPreRespawnAngle(serverPlayer.getRespawnAngle());
+                    var p = (IServerPlayerMixin) serverPlayer;
+                    RespawnData respawnData = new RespawnData(serverPlayer.getRespawnDimension(),
+                            serverPlayer.getRespawnPosition(), serverPlayer.getRespawnAngle());
+                    p.end_respawn_anchor$setRespawnData(respawnData);
                 }
                 serverPlayer.setRespawnPosition(level.dimension(), pos, 0.0f, false, true);
                 level.playSound(null, (double) pos.getX() + 0.5, (double) pos.getY() + 0.5, (double) pos.getZ() + 0.5,
@@ -85,9 +85,16 @@ public class EndRespawnAnchorBlock extends RespawnAnchorBlock {
             return InteractionResult.CONSUME;
         }
         if (!level.isClientSide) {
-            super.explode(state, level, pos);
+            this.explode(state, level, pos);
         }
         return InteractionResult.sidedSuccess(level.isClientSide);
+    }
+
+    @Override
+    public final void explode(BlockState state, Level level, BlockPos pos2) {
+        if (EndRespawnAnchor.HOLDER.isExplode) {
+            super.explode(state, level, pos2);
+        }
     }
 
     private static boolean isRespawnFuel(ItemStack stack) {

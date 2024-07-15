@@ -23,12 +23,10 @@ package com.github.mikn.end_respawn_anchor.asm.mixin;
 
 import com.github.mikn.end_respawn_anchor.EndRespawnAnchor;
 import com.github.mikn.end_respawn_anchor.IServerPlayerMixin;
+import com.github.mikn.end_respawn_anchor.RespawnData;
 import com.github.mikn.end_respawn_anchor.block.EndRespawnAnchorBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtOps;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
@@ -42,7 +40,6 @@ import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArgs;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
@@ -52,88 +49,34 @@ import java.util.Optional;
 @Debug(export = true)
 @Mixin(ServerPlayer.class)
 public abstract class ServerPlayerMixin implements IServerPlayerMixin {
-    @Shadow
-    public abstract ServerLevel serverLevel();
 
     @Unique
-    private BlockPos end_respawn_anchor$preSpawnPos = null;
-    @Unique
-    private ResourceKey<Level> end_respawn_anchor$preSpawnDimension = Level.OVERWORLD;
-    @Unique
-    private float end_respawn_anchor$preSpawnAngle = 0.0f;
-    @Unique
-    private static final String NBT_KEY_PLAYER_SPAWN_DIMENSION = "preSpawnDimension";
-    @Unique
-    private static final String NBT_KEY_PLAYER_SPAWN_POS_X = "preSpawnPosX";
-    @Unique
-    private static final String NBT_KEY_PLAYER_SPAWN_POS_Y = "preSpawnPosY";
-    @Unique
-    private static final String NBT_KEY_PLAYER_SPAWN_POS_Z = "preSpawnPosZ";
-    @Unique
-    private static final String NBT_KEY_PLAYER_SPAWN_ANGLE = "preSpawnAngle";
+    private RespawnData respawnData;
 
     @Unique
-    @Override
-    public void end_respawn_anchor$setPreBlockPos(BlockPos blockPos) {
-        this.end_respawn_anchor$preSpawnPos = blockPos;
+    public void end_respawn_anchor$setRespawnData(RespawnData respawnData) {
+        this.respawnData = respawnData;
     }
 
     @Unique
-    @Override
-    public BlockPos end_respawn_anchor$getPreBlockPos() {
-        return this.end_respawn_anchor$preSpawnPos;
-    }
-
-    @Unique
-    @Override
-    public void end_respawn_anchor$setPreRespawnDimension(ResourceKey<Level> dimension) {
-        this.end_respawn_anchor$preSpawnDimension = dimension;
-    }
-
-    @Unique
-    @Override
-    public ResourceKey<Level> end_respawn_anchor$getPreRespawnDimension() {
-        return this.end_respawn_anchor$preSpawnDimension;
-    }
-
-    @Unique
-    @Override
-    public void end_respawn_anchor$setPreRespawnAngle(float f) {
-        this.end_respawn_anchor$preSpawnAngle = f;
-    }
-
-    @Unique
-    @Override
-    public float end_respawn_anchor$getPreRespawnAngle() {
-        return this.end_respawn_anchor$preSpawnAngle;
+    public RespawnData end_respawn_anchor$getRespawnData() {
+        return this.respawnData;
     }
 
     @Inject(method = "addAdditionalSaveData(Lnet/minecraft/nbt/CompoundTag;)V", at = @At("TAIL"))
     private void end_respawn_anchor$addAdditionalSaveData(CompoundTag compound, CallbackInfo ci) {
-        var p = (IServerPlayerMixin) (Object) this;
-        if (p.end_respawn_anchor$getPreBlockPos() != null) {
-            CompoundTag element = new CompoundTag();
-            element.putInt(NBT_KEY_PLAYER_SPAWN_POS_X, p.end_respawn_anchor$getPreBlockPos().getX());
-            element.putInt(NBT_KEY_PLAYER_SPAWN_POS_Y, p.end_respawn_anchor$getPreBlockPos().getY());
-            element.putInt(NBT_KEY_PLAYER_SPAWN_POS_Z, p.end_respawn_anchor$getPreBlockPos().getZ());
-            element.putString(NBT_KEY_PLAYER_SPAWN_DIMENSION,
-                    p.end_respawn_anchor$getPreRespawnDimension().location().toString());
-            element.putFloat(NBT_KEY_PLAYER_SPAWN_ANGLE, p.end_respawn_anchor$getPreRespawnAngle());
-            compound.put(EndRespawnAnchor.MODID, element);
+        var p = (IServerPlayerMixin) this;
+        if (p.end_respawn_anchor$getRespawnData() != null) {
+            CompoundTag tag = this.respawnData.serializeNBT();
+            compound.put(EndRespawnAnchor.MODID, tag);
         }
     }
 
     @Inject(method = "readAdditionalSaveData(Lnet/minecraft/nbt/CompoundTag;)V", at = @At("TAIL"))
     private void end_respawn_anchor$readAdditionalSaveData(CompoundTag compound, CallbackInfo ci) {
         if (compound.contains(EndRespawnAnchor.MODID)) {
-            var p = (IServerPlayerMixin) (Object) this;
             CompoundTag tag = compound.getCompound(EndRespawnAnchor.MODID);
-            p.end_respawn_anchor$setPreBlockPos(new BlockPos(tag.getInt(NBT_KEY_PLAYER_SPAWN_POS_X),
-                    tag.getInt(NBT_KEY_PLAYER_SPAWN_POS_Y), tag.getInt(NBT_KEY_PLAYER_SPAWN_POS_Z)));
-            p.end_respawn_anchor$setPreRespawnDimension(Level.RESOURCE_KEY_CODEC
-                    .parse(NbtOps.INSTANCE, tag.get(NBT_KEY_PLAYER_SPAWN_DIMENSION))
-                    .resultOrPartial(EndRespawnAnchor.LOGGER::error).orElse(Level.OVERWORLD));
-            p.end_respawn_anchor$setPreRespawnAngle(tag.getFloat(NBT_KEY_PLAYER_SPAWN_ANGLE));
+            this.respawnData = RespawnData.deserializeNBT(tag);
         }
     }
 
@@ -141,10 +84,8 @@ public abstract class ServerPlayerMixin implements IServerPlayerMixin {
     private void end_respawn_anchor$restoreFrom(ServerPlayer that, boolean keepEverything, CallbackInfo ci) {
         var newPlayer = (IServerPlayerMixin) this;
         var oldPlayer = (IServerPlayerMixin) that;
-        if (oldPlayer.end_respawn_anchor$getPreRespawnDimension() != null) {
-            newPlayer.end_respawn_anchor$setPreBlockPos(oldPlayer.end_respawn_anchor$getPreBlockPos());
-            newPlayer.end_respawn_anchor$setPreRespawnDimension(oldPlayer.end_respawn_anchor$getPreRespawnDimension());
-            newPlayer.end_respawn_anchor$setPreRespawnAngle(oldPlayer.end_respawn_anchor$getPreRespawnAngle());
+        if (oldPlayer.end_respawn_anchor$getRespawnData() != null) {
+            newPlayer.end_respawn_anchor$setRespawnData(oldPlayer.end_respawn_anchor$getRespawnData());
         }
     }
 
@@ -159,7 +100,7 @@ public abstract class ServerPlayerMixin implements IServerPlayerMixin {
             Optional<Vec3> optional = EndRespawnAnchorBlock.findStandUpPosition(EntityType.PLAYER, level, blockPos);
             if (!forced && !keepInventory && optional.isPresent()) {
                 level.setBlock(blockPos, blockState.setValue(EndRespawnAnchorBlock.CHARGE,
-                        Integer.valueOf(blockState.getValue(EndRespawnAnchorBlock.CHARGE) - 1)), 3);
+                        blockState.getValue(EndRespawnAnchorBlock.CHARGE) - 1), 3);
             }
             cir.setReturnValue(optional.map(vec3 -> ServerPlayer.RespawnPosAngle.of(vec3, blockPos)));
         }
@@ -171,16 +112,12 @@ public abstract class ServerPlayerMixin implements IServerPlayerMixin {
         ServerPlayer serverPlayer = (ServerPlayer) (Object) this;
         if (shouldOverrideSpawnData(serverPlayer)) {
             var p = (IServerPlayerMixin) serverPlayer;
-            Optional<BlockPos> optionalBlockPos = Optional.ofNullable((p.end_respawn_anchor$getPreBlockPos()));
-            Optional<Float> optionalAngle = Optional.ofNullable((p.end_respawn_anchor$getPreRespawnAngle()));
-            ResourceKey<Level> respawnDimension = p.end_respawn_anchor$getPreRespawnDimension();
-            optionalBlockPos.ifPresent(blockPos -> optionalAngle.ifPresent(angle -> {
-                serverPlayer.getServer().sendSystemMessage(Component
-                        .literal(String.valueOf(serverPlayer.getServer().getLevel(respawnDimension).dimension())));
-                args.set(0, serverPlayer.getServer().getLevel(respawnDimension));
-                args.set(1, blockPos);
-                args.set(2, angle);
-            }));
+            Optional<RespawnData> optionalRespawnData = Optional.ofNullable(p.end_respawn_anchor$getRespawnData());
+            optionalRespawnData.ifPresent(respawnData -> {
+                args.set(0, serverPlayer.getServer().getLevel(respawnData.getDimension()));
+                args.set(1, respawnData.getBlockPos());
+                args.set(2, respawnData.getRespawnAngle());
+            });
         }
     }
 
@@ -189,12 +126,9 @@ public abstract class ServerPlayerMixin implements IServerPlayerMixin {
         ServerPlayer serverPlayer = (ServerPlayer) (Object) this;
         if (shouldOverrideSpawnData(serverPlayer)) {
             var p = (IServerPlayerMixin) serverPlayer;
-            Optional<BlockPos> optionalBlockPos = Optional.ofNullable((p.end_respawn_anchor$getPreBlockPos()));
-            Optional<Float> optionalAngle = Optional.ofNullable((p.end_respawn_anchor$getPreRespawnAngle()));
-            ResourceKey<Level> respawnDimension = p.end_respawn_anchor$getPreRespawnDimension();
-            if (optionalBlockPos.isPresent() && optionalAngle.isPresent()) {
-                args.set(0, serverPlayer.getServer().getLevel(respawnDimension));
-            }
+            Optional<RespawnData> optionalRespawnData = Optional.ofNullable(p.end_respawn_anchor$getRespawnData());
+            optionalRespawnData.ifPresent(
+                    respawnData -> args.set(0, serverPlayer.getServer().getLevel(respawnData.getDimension())));
         }
     }
 
