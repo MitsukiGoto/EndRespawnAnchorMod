@@ -24,6 +24,11 @@ neoForge {
     version = neo_version
     validateAccessTransformers = true
 
+    parchment {
+        minecraftVersion = "1.21"
+        mappingsVersion = "2024.07.07"
+    }
+
     runs {
         register("client") {
             client()
