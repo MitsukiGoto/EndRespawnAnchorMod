@@ -3,7 +3,7 @@ import com.matthewprenger.cursegradle.CurseProject
 import com.matthewprenger.cursegradle.Options
 
 plugins {
-    id("net.neoforged.moddev") version "0.1.126"
+    id("net.neoforged.moddev") version "2.0.61-beta"
     id("com.matthewprenger.cursegradle") version "1.4.0"
     id("com.modrinth.minotaur") version "2.+"
 }
@@ -25,16 +25,19 @@ neoForge {
     validateAccessTransformers = true
 
     parchment {
-        minecraftVersion = "1.21"
-        mappingsVersion = "2024.07.07"
+        minecraftVersion = "1.21.4"
+        mappingsVersion = "2024.12.07"
     }
 
     runs {
         register("client") {
             client()
         }
-        register("data") {
-            data()
+        register("clientData") {
+            clientData()
+        }
+        register("serverData") {
+            serverData()
         }
         register("server") {
             server()
