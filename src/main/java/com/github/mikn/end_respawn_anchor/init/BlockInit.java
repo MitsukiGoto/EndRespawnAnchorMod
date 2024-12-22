@@ -23,6 +23,8 @@ package com.github.mikn.end_respawn_anchor.init;
 
 import com.github.mikn.end_respawn_anchor.EndRespawnAnchor;
 import com.github.mikn.end_respawn_anchor.block.EndRespawnAnchorBlock;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RespawnAnchorBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -32,11 +34,14 @@ import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 public class BlockInit {
-        public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(EndRespawnAnchor.MODID);
-        public static final DeferredBlock<Block> END_RESPAWN_ANCHOR = BLOCKS.register("end_respawn_anchor",
-                        () -> new EndRespawnAnchorBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK)
-                                        .instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops()
-                                        .strength(50.0F, 1200.0F)
-                                        .lightLevel((p_152639_) -> RespawnAnchorBlock.getScaledChargeLevel(p_152639_,
-                                                        15))));
+    public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(
+            EndRespawnAnchor.MODID);
+    public static final DeferredBlock<Block> END_RESPAWN_ANCHOR = BLOCKS.register(
+            "end_respawn_anchor",
+            registryName -> new EndRespawnAnchorBlock(BlockBehaviour.Properties.of().setId(
+                    ResourceKey.create(Registries.BLOCK, registryName)).mapColor(MapColor.COLOR_BLACK)
+                    .instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops()
+                    .strength(50.0F, 1200.0F)
+                    .lightLevel((p_152639_) -> RespawnAnchorBlock.getScaledChargeLevel(p_152639_,
+                            15))));
 }

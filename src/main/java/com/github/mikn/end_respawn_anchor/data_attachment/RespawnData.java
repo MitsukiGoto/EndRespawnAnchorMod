@@ -23,6 +23,7 @@ package com.github.mikn.end_respawn_anchor.data_attachment;
 
 import com.github.mikn.end_respawn_anchor.EndRespawnAnchor;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -53,17 +54,35 @@ public class RespawnData implements INBTSerializable<CompoundTag> {
         return this.dimension;
     }
 
+    private void setDimension(ResourceKey<Level> dimension) {
+        this.dimension = dimension;
+    }
+
     public BlockPos getBlockPos() {
         return this.blockPos;
+    }
+
+    private void setBlockPos(BlockPos blockPos) {
+        this.blockPos = blockPos;
     }
 
     public float getRespawnAngle() {
         return this.respawnAngle;
     }
 
+    private void setRespawnAngle(float respawnAngle) {
+        this.respawnAngle = respawnAngle;
+    }
+
     @Override
     public CompoundTag serializeNBT(HolderLookup.Provider provider) {
         CompoundTag tag = new CompoundTag();
+        if (this.blockPos == null || this.dimension == null) {
+            var level = Minecraft.getInstance().level;
+            setDimension(Level.OVERWORLD);
+            setBlockPos(level.getSharedSpawnPos());
+            setRespawnAngle(level.getSharedSpawnAngle());
+        }
         tag.putString(NBT_KEY_PLAYER_SPAWN_DIMENSION, this.dimension.location().toString());
         tag.putInt(NBT_KEY_PLAYER_SPAWN_POS_X, this.blockPos.getX());
         tag.putInt(NBT_KEY_PLAYER_SPAWN_POS_Y, this.blockPos.getY());
@@ -82,8 +101,8 @@ public class RespawnData implements INBTSerializable<CompoundTag> {
         int posZ = tag.getInt(NBT_KEY_PLAYER_SPAWN_POS_Z);
         float angle = tag.getFloat(NBT_KEY_PLAYER_SPAWN_ANGLE);
         BlockPos blockPos = new BlockPos(posX, posY, posZ);
-        this.dimension = dimension;
-        this.blockPos = blockPos;
-        this.respawnAngle = angle;
+        setDimension(dimension);
+        setBlockPos(blockPos);
+        setRespawnAngle(angle);
     }
 }

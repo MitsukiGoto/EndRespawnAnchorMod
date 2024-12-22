@@ -28,7 +28,9 @@ import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 public class ItemInit {
-    public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(EndRespawnAnchor.MODID);
-    public static final DeferredItem<Item> END_RESPAWN_ANCHOR = ITEMS.register("end_respawn_anchor",
-            () -> new BlockItem(BlockInit.END_RESPAWN_ANCHOR.get(), new Item.Properties()));
+  public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(
+      EndRespawnAnchor.MODID);
+  public static final DeferredItem<BlockItem> END_RESPAWN_ANCHOR = ITEMS.registerSimpleBlockItem(
+      "end_respawn_anchor", BlockInit.END_RESPAWN_ANCHOR, new Item.Properties());
+
 }

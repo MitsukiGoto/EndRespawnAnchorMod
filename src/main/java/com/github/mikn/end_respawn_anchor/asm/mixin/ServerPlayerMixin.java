@@ -21,20 +21,17 @@
 
 package com.github.mikn.end_respawn_anchor.asm.mixin;
 
-import com.github.mikn.end_respawn_anchor.EndRespawnAnchor;
 import com.github.mikn.end_respawn_anchor.block.EndRespawnAnchorBlock;
 import com.github.mikn.end_respawn_anchor.config.EndRespawnAnchorConfig;
-import com.github.mikn.end_respawn_anchor.data_attachment.RespawnData;
 import com.github.mikn.end_respawn_anchor.init.DataAttachmentInit;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.portal.DimensionTransition;
 import net.minecraft.world.phys.Vec3;
 
 import org.spongepowered.asm.mixin.*;
@@ -49,6 +46,9 @@ import java.util.Optional;
 @Debug(export = true)
 @Mixin(ServerPlayer.class)
 public abstract class ServerPlayerMixin {
+
+    @Shadow
+    public abstract ServerLevel serverLevel();
 
     @Inject(method = "findRespawnAndUseSpawnBlock(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;FZZ)Ljava/util/Optional;", at = @At("HEAD"), cancellable = true)
     private static void checkIfEndRespawnAnchor(ServerLevel level, BlockPos blockPos, float angle, boolean forced,
@@ -67,24 +67,41 @@ public abstract class ServerPlayerMixin {
         }
     }
 
-    @ModifyArgs(method = "findRespawnPositionAndUseSpawnBlock(ZLnet/minecraft/world/level/portal/DimensionTransition$PostDimensionTransition;)Lnet/minecraft/world/level/portal/DimensionTransition;", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;findRespawnAndUseSpawnBlock(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;FZZ)Ljava/util/Optional;"))
-    private void modifyArgs(Args args, boolean keepInventory,
-            DimensionTransition.PostDimensionTransition postDimensionTransition) {
+    @ModifyArgs(method = "findRespawnPositionAndUseSpawnBlock(ZLnet/minecraft/world/level/portal/TeleportTransition$PostTeleportTransition;)Lnet/minecraft/world/level/portal/TeleportTransition;", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;findRespawnAndUseSpawnBlock(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;FZZ)Ljava/util/Optional;"))
+    private void modifyArgs(Args args) {
         ServerPlayer serverPlayer = (ServerPlayer) (Object) this;
-        if (shouldOverrideSpawnData(serverPlayer) && serverPlayer.hasData(DataAttachmentInit.RESPAWN_DATA)) {
-            var data = serverPlayer.getData(DataAttachmentInit.RESPAWN_DATA);
-            args.set(0, serverPlayer.getServer().getLevel(data.getDimension()));
-            args.set(1, data.getBlockPos());
-            args.set(2, data.getRespawnAngle());
+        if (shouldOverrideSpawnData(serverPlayer)) {
+            ResourceKey<Level> resourceKey;
+            BlockPos blockPos;
+            float respawnAngle;
+            if (serverPlayer.hasData(DataAttachmentInit.RESPAWN_DATA)) {
+                var data = serverPlayer.getData(DataAttachmentInit.RESPAWN_DATA);
+                resourceKey = data.getDimension();
+                blockPos = data.getBlockPos();
+                respawnAngle = data.getRespawnAngle();
+            } else {
+                resourceKey = Level.OVERWORLD;
+                blockPos = serverLevel().getSharedSpawnPos();
+                respawnAngle = serverPlayer.getRespawnAngle();
+            }
+            args.set(0, serverPlayer.getServer().getLevel(resourceKey));
+            args.set(1, blockPos);
+            args.set(2, respawnAngle);
         }
     }
 
-    @ModifyArgs(method = "findRespawnPositionAndUseSpawnBlock(ZLnet/minecraft/world/level/portal/DimensionTransition$PostDimensionTransition;)Lnet/minecraft/world/level/portal/DimensionTransition;", at = @At(value = "INVOKE", target = "net/minecraft/world/level/portal/DimensionTransition.<init> (Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/world/phys/Vec3;FFLnet/minecraft/world/level/portal/DimensionTransition$PostDimensionTransition;)V"))
+    @ModifyArgs(method = "findRespawnPositionAndUseSpawnBlock(ZLnet/minecraft/world/level/portal/TeleportTransition$PostTeleportTransition;)Lnet/minecraft/world/level/portal/TeleportTransition;", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;getLevel(Lnet/minecraft/resources/ResourceKey;)Lnet/minecraft/server/level/ServerLevel;"))
     private void modifyReturnedServerLevel(Args args) {
         ServerPlayer serverPlayer = (ServerPlayer) (Object) this;
-        if (shouldOverrideSpawnData(serverPlayer) && serverPlayer.hasData(DataAttachmentInit.RESPAWN_DATA)) {
-            var data = serverPlayer.getData(DataAttachmentInit.RESPAWN_DATA);
-            args.set(0, serverPlayer.getServer().getLevel(data.getDimension()));
+        if (shouldOverrideSpawnData(serverPlayer)) {
+            ResourceKey<Level> resourceKey;
+            if (serverPlayer.hasData(DataAttachmentInit.RESPAWN_DATA)) {
+                var data = serverPlayer.getData(DataAttachmentInit.RESPAWN_DATA);
+                resourceKey = data.getDimension();
+            } else {
+                resourceKey = Level.OVERWORLD;
+            }
+            args.set(0, resourceKey);
         }
     }
 
@@ -93,7 +110,7 @@ public abstract class ServerPlayerMixin {
         // Both Respawn Dimension and position should be overridden when players have
         // set their spawn point in the End.
         return EndRespawnAnchorConfig.shouldChangeSpawnInfo.get() && isInsidePortal()
-                && serverPlayer.level().dimension() == Level.END && serverPlayer.getRespawnDimension() == Level.END;
+                && serverLevel().dimension() == Level.END && serverPlayer.getRespawnDimension() == Level.END;
     }
 
     @Unique
